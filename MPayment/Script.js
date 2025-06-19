@@ -141,27 +141,51 @@
   }
 
   async function checkPaymentStatus(paymentId) {
-    try {
-      const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getPaymentStatus&paymentId=${paymentId}`);
-      const data = await response.json();
+  try {
+    const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getPaymentStatus&paymentId=${paymentId}`);
+    const data = await response.json();
 
-      if (data.success) {
-        if (data.status === 'approved') {
-          showSuccessMessage();
-          localStorage.setItem('privilegeAccess', 'true');
-          localStorage.removeItem(PAYMENT_STORAGE_KEY);
-        } else if (data.status === 'pending') {
-          setTimeout(() => checkPaymentStatus(paymentId), 5000);
-        } else {
-          document.getElementById('statusMessage').textContent = `Status do pagamento: ${data.statusDetail}`;
-        }
+    if (data.success) {
+      if (data.status === 'approved') {
+        // Adiciona créditos
+        let currentCredits = parseInt(localStorage.getItem('credits')) || 0;
+        let newCredits = currentCredits + 18;
+        localStorage.setItem('credits', newCredits);
+
+        // Sinaliza privilégio e remove dados antigos do pagamento
+        localStorage.setItem('privilegeAccess', 'true');
+        localStorage.removeItem(PAYMENT_STORAGE_KEY);
+
+        // Mostra mensagem de sucesso no modal
+        showSuccessMessage();
+
+        // Atualiza a URL para remover query params (opcional)
+        const newUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState(null, '', newUrl);
+
+        // Recarrega para atualizar a interface com os novos créditos
+        location.reload();
+
+      } else if (data.status === 'pending') {
+        setTimeout(() => checkPaymentStatus(paymentId), 5000);
       } else {
-        document.getElementById('statusMessage').textContent = `Erro: ${data.message}`;
+        document.getElementById('statusMessage').textContent = `Status do pagamento: ${data.statusDetail}`;
       }
-    } catch (error) {
-      document.getElementById('statusMessage').textContent = `Erro na conexão: ${error.message}`;
+    } else {
+      document.getElementById('statusMessage').textContent = `Erro: ${data.message}`;
     }
+  } catch (error) {
+    document.getElementById('statusMessage').textContent = `Erro na conexão: ${error.message}`;
   }
+}
+
+
+
+
+
+
+
+
 
   function showSuccessMessage() {
     const modalContent = document.getElementById('modalInnerContent');
