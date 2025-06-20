@@ -726,7 +726,62 @@ function updateDisplay() {
 
   
 
-(function () {
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  document.getElementById("recargaPix").addEventListener("click", function () {
+    if (typeof openPaymentModal === "function") {
+      openPaymentModal();
+    }
+  });
+
+
+
+  
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+  (function () {
   const body = document.body;
   body.classList.add('modal-body'); // Adiciona classe exclusiva ao body
 
@@ -938,37 +993,7 @@ function updateDisplay() {
 })();
 
 
-
-
-
-
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<script>
-  document.getElementById("recargaPix").addEventListener("click", function () {
-    if (typeof openPaymentModal === "function") {
-      openPaymentModal();
-    }
-  });
-
-
-
-  
-</script>
-
-
 
 
 <script src="MPayment/Modal.js"></script>
