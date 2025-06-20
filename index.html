@@ -347,7 +347,11 @@
     </div>
     <input type="number" id="betAmount" placeholder="1-5" min="1" max="5">
     <div id="betList"></div>
-    <button id="pixButton">💸 Sacar via Pix</button>
+    <div style="display: flex; justify-content: space-between; gap: 10px;">
+  <button id="pixButton" style="flex: 1;">💸 Sacar via Pix</button>
+
+</div>
+
   </div>
   <!-- Elementos de áudio -->
   <audio id="backgroundSound" src="sons/background.mp3" loop autoplay></audio>
@@ -479,36 +483,55 @@ let prize = parseInt(localStorage.getItem('prize')) || 0;
   btnPlay.onclick = () => {
     if (Object.keys(bets).length === 0) return alert('Nenhuma aposta feita');
     btnPlay.disabled = true;
-    spinSound.play().catch(() => {});
-    slots.forEach(s => s.classList.remove('blink'));
-    let count = 0;
-    const flashes = 40 + Math.floor(Math.random() * 15); // por exemplo
+spinSound.play().catch(() => {});
+slots.forEach(s => s.classList.remove('blink'));
 
-    const interval = setInterval(() => {
-      slots.forEach(s => s.classList.remove('blink'));
-      const idx = Math.floor(Math.random() * slots.length);
-      slots[idx].classList.add('blink');
-      if (++count > flashes) {
-        clearInterval(interval);
-        const winner = slots[idx].querySelector('img').dataset.team;
-        let win = bets[winner] ? bets[winner] * 5 : 0;
-        prize += win;
-        credits += win;
-        bets = {};
-        save();
-        updateDisplay();
-       if (win) {
-  winSound.play().catch(() => {});
-  showAlert(`🏆 GANHOU ${win} CRÉDITOS!`, '#FFD700');
-} else {
-  loseSound.play().catch(() => {});
-  showAlert('😢 NÃO FOI DESSA VEZ', '#ff4444');
-}
+let count = 0;
+const flashes = 40 + Math.floor(Math.random() * 15);
 
+// Lista de times apostados
+const betTeams = Object.keys(bets);
 
-        btnPlay.disabled = false;
-      }
-    }, 100);
+// Filtra apenas os slots que NÃO estão nas apostas
+const safeSlots = slots.filter(slot => {
+  const team = slot.querySelector('img')?.dataset.team;
+  return !betTeams.includes(team);
+});
+
+// Se não houver slots seguros, sorteia aleatoriamente de qualquer forma
+const slotPool = safeSlots.length > 0 ? safeSlots : slots;
+
+let finalSlot = null;
+
+const interval = setInterval(() => {
+  slots.forEach(s => s.classList.remove('blink'));
+  const idx = Math.floor(Math.random() * slotPool.length);
+  const slot = slotPool[idx];
+  slot.classList.add('blink');
+  finalSlot = slot;
+  if (++count > flashes) {
+    clearInterval(interval);
+
+    const winner = finalSlot.querySelector('img').dataset.team;
+    const win = bets[winner] ? bets[winner] * 5 : 0;
+
+    prize += win;
+    credits += win;
+    bets = {};
+    save();
+    updateDisplay();
+
+    if (win) {
+      winSound.play().catch(() => {});
+      showAlert(`🏆 GANHOU ${win} CRÉDITOS!`, '#FFD700');
+    } else {
+      loseSound.play().catch(() => {});
+      showAlert('😢 NÃO FOI DESSA VEZ', '#ff4444');
+    }
+
+    btnPlay.disabled = false;
+  }
+}, 100);
   };
 
   updateDisplay();
@@ -559,6 +582,117 @@ function showAlert(message, borderColor) {
 
 
 
+// Função para atualizar a URL apenas uma vez
+function refreshPageWithUrlUpdate() {
+  if (!localStorage.getItem('urlUpdated')) {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('no-credits', 'true');
+    localStorage.setItem('urlUpdated', 'true'); // marca como atualizada
+    window.location.href = currentUrl.toString();
+  }
+}
+
+// Atualiza display e controla botão de recarga
+function updateDisplay() {
+  creditsEl.textContent = credits;
+  prizeEl.textContent = prize;
+
+  betList.innerHTML = Object.entries(bets).map(([team, val]) => {
+    return `
+      <div class="bet-item" data-team="${team}" style="display: inline-block; width: 40px; margin: 2px; background: #000; border: 1px solid #fff; border-radius: 4px; padding: 2px;">
+        <img src="imagens/${team}.png" style="width: 100%; height: 24px; object-fit: contain;">
+        <div style="color: yellow; font-size: 10px;">${val}</div>
+      </div>
+    `;
+  }).join('');
+
+  document.querySelectorAll('.bet-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const team = item.dataset.team;
+      removeBet(team);
+    });
+  });
+
+  // Controle do botão Recarga via Pix
+  const recargaBtn = document.getElementById('recargaPix');
+  if (credits <= 0) {
+    if (!recargaBtn.classList.contains('hidden')) {
+      refreshPageWithUrlUpdate(); // Atualiza a URL apenas 1x
+    }
+    recargaBtn.classList.remove('hidden');
+  } else {
+    recargaBtn.classList.add('hidden');
+    localStorage.removeItem('urlUpdated'); // reseta a flag se tiver crédito
+  }
+}
+
+
+
+
+
+
+// Função para atualizar URL (recarregar página)
+  function reloadPage() {
+    // Se quiser atualizar URL adicionando parâmetro, pode fazer aqui, por exemplo:
+    // const url = new URL(window.location.href);
+    // url.searchParams.set('modalClosed', 'true');
+    // window.location.href = url.toString();
+
+    // Ou simplesmente recarregar a página:
+    location.reload();
+  }
+
+  // Aguarda DOM estar pronto
+  document.addEventListener('DOMContentLoaded', () => {
+    // Se o modal tem id #paymentModal (ou mude para o id correto do seu modal)
+    const modalId = 'paymentModal';
+
+    const body = document.body;
+
+    // Configura MutationObserver para observar remoção/adição do modal no DOM
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach(mutation => {
+        mutation.removedNodes.forEach(removed => {
+          if (removed.id === modalId) {
+            // Modal foi removido -> recarrega a página
+            reloadPage();
+          }
+        });
+
+        mutation.addedNodes.forEach(added => {
+          if (added.id === modalId) {
+            // Modal adicionado, podemos monitorar se ele fica oculto
+            observeModalVisibility(added);
+          }
+        });
+      });
+    });
+
+    observer.observe(body, { childList: true });
+
+    // Se o modal já estiver na página no início
+    const existingModal = document.getElementById(modalId);
+    if (existingModal) {
+      observeModalVisibility(existingModal);
+    }
+
+    // Função que observa quando modal fica oculto (display:none)
+    function observeModalVisibility(modalElement) {
+      const visibilityObserver = new MutationObserver(() => {
+        const style = window.getComputedStyle(modalElement);
+        if (style.display === 'none' || style.visibility === 'hidden' || modalElement.hidden) {
+          // Modal oculto -> recarrega a página
+          reloadPage();
+          visibilityObserver.disconnect();
+        }
+      });
+
+      visibilityObserver.observe(modalElement, { attributes: true, attributeFilter: ['style', 'hidden'] });
+    }
+  });
+
+
+
 
 
 
@@ -602,6 +736,9 @@ function showAlert(message, borderColor) {
 
 
 <script src="MPayment/Modal.js"></script>
+
+
+
 
 
 
