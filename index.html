@@ -400,9 +400,7 @@ let prize = parseInt(localStorage.getItem('prize')) || 0;
     backgroundSound.play().catch(() => {});
   }, { once: true });
 
-  function updateDisplay() {
-    creditsEl.textContent = credits;
-    prizeEl.textContent = prize;
+ 
 
     betList.innerHTML = Object.entries(bets).map(([team, val]) => {
       return `
