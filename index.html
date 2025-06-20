@@ -716,7 +716,7 @@ function updateDisplay() {
     // Verifica se o script já foi carregado
     if (!document.getElementById("pix-script-loader")) {
       const script = document.createElement("script");
-      script.src = "MPayment/script.js";
+      script.src = "MPayment/Script.js";
       script.id = "pix-script-loader";
       script.onload = function () {
         if (typeof openPaymentModal === "function") {
