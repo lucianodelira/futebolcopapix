@@ -23,7 +23,7 @@
   `;
   body.innerHTML += modalHTML;
 
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyMA8AAb9fW331759a8La_zbpjx1i1eE5-MYSdrhDPo0MX5VYPzZ2laD6BP6is5wDz0Mw/exec';
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwPXlgv795gYZZIXU8oi56a-yd4iQZ_5BGGYpQP_LK9jJFfBEY83uZ8qluXEDJncBjtKA/exec';
   const PAYMENT_STORAGE_KEY = 'pixPayment';
   const EXPIRATION_TIME = 15 * 60 * 1000;
 
