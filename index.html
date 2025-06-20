@@ -186,29 +186,110 @@
     #betAmount {
       display: none;
     }
-    #pixButton {
-      margin-top: 8px;
-      width: 100%;
-      height: 35px;
-      background: #00cc00;
-      border: 1px solid #fff;
-      color: white;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 6px;
-      transition: transform 0.2s;
-    }
-    #pixButton:hover {
-      transform: scale(1.05);
-    }
+   #pixButton {
+  margin-top: 8px;
+  width: 100%;
+  height: 35px;
+  background: #007BFF; /* azul padrão */
+  border: 1px solid #fff;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: transform 0.2s, background 0.3s;
+}
+
+#pixButton:hover {
+  transform: scale(1.05);
+  background: #005FCC; /* azul mais escuro no hover */
+}
+
+
+
+
+ #recargaPix {
+    margin-top: 12px;
+    width: 100%;
+    height: 40px;
+    background-color: #00aa00;
+    border: none;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+
+  #recargaPix:hover {
+    background-color: #008800;
+  }
+
+  #recargaPix:active {
+    background-color: #006600;
+  }
+
+
+#alertBox {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #111;
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: 2px solid;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.2);
+  z-index: 999;
+  animation: fadeAlert 2s ease-in-out;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes fadeAlert {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+
+
+
   </style>
+
+
 </head>
 <body>
+
+
+
+
+
+
+
+
+
+
+
 <div id="app">
   <div class="top-bar">
     <div>PRÊMIO: <span id="prize">0</span></div>
     <div>CRÉDITOS: <span id="credits">100</span></div>
+
+
+
+
+
+
+
+
+
   </div>
   <div id="board">
     <div class="slot" style="grid-area:tl"><img src="imagens/br.png" class="flag-img" data-team="br"></div>
@@ -239,6 +320,7 @@
 <!-- Botão para abrir o modal e carregar script -->
 <button id="recargaPix">Recarga via Pix</button>
 
+<div id="alertBox" class="hidden"></div>
 
 
     <hr>
@@ -285,9 +367,11 @@
 
 
 
-
 let credits = parseInt(localStorage.getItem('credits')) || 0;
 let prize = parseInt(localStorage.getItem('prize')) || 0;
+
+
+
 
   let bets = {};
 
@@ -324,6 +408,9 @@ let prize = parseInt(localStorage.getItem('prize')) || 0;
         </div>
       `;
     }).join('');
+
+
+
 
     // Adiciona evento de clique aos itens de aposta
     document.querySelectorAll('.bet-item').forEach(item => {
@@ -410,13 +497,15 @@ let prize = parseInt(localStorage.getItem('prize')) || 0;
         bets = {};
         save();
         updateDisplay();
-        if (win) {
-          winSound.play().catch(() => {});
-          alert(`GANHOU ${win} CRÉDITOS!`);
-        } else {
-          loseSound.play().catch(() => {});
-          alert('NÃO FOI DESSA VEZ');
-        }
+       if (win) {
+  winSound.play().catch(() => {});
+  showAlert(`🏆 GANHOU ${win} CRÉDITOS!`, '#FFD700');
+} else {
+  loseSound.play().catch(() => {});
+  showAlert('😢 NÃO FOI DESSA VEZ', '#ff4444');
+}
+
+
         btnPlay.disabled = false;
       }
     }, 100);
@@ -433,6 +522,16 @@ let prize = parseInt(localStorage.getItem('prize')) || 0;
 
 
 
+function showAlert(message, borderColor) {
+  const alertBox = document.getElementById('alertBox');
+  alertBox.textContent = message;
+  alertBox.style.borderColor = borderColor;
+  alertBox.classList.remove('hidden');
+
+  setTimeout(() => {
+    alertBox.classList.add('hidden');
+  }, 2000);
+}
 
 
 
