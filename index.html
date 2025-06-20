@@ -396,21 +396,7 @@ let prize = parseInt(localStorage.getItem('prize')) || 0;
   backgroundSound.volume = 0.4;
 
   // Inicia a trilha de fundo na primeira interação para contornar restrições de autoplay
-  document.addEventListener('click', () => {
-    backgroundSound.play().catch(() => {});
-  }, { once: true });
-
  
-
-    betList.innerHTML = Object.entries(bets).map(([team, val]) => {
-      return `
-        <div class="bet-item" data-team="${team}" style="display: inline-block; width: 40px; margin: 2px; background: #000; border: 1px solid #fff; border-radius: 4px; padding: 2px;">
-          <img src="imagens/${team}.png" style="width: 100%; height: 24px; object-fit: contain;">
-          <div style="color: yellow; font-size: 10px;">${val}</div>
-        </div>
-      `;
-    }).join('');
-
 
 
 
