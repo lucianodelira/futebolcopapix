@@ -697,7 +697,6 @@ function updateDisplay() {
 
 
 
-</script>
 
 
 
@@ -711,12 +710,6 @@ function updateDisplay() {
 
 
 
-<script>
-  document.getElementById("recargaPix").addEventListener("click", function () {
-    if (typeof openPaymentModal === "function") {
-      openPaymentModal();
-    }
-  });
 
 
 
@@ -725,6 +718,13 @@ function updateDisplay() {
 
 
 
+
+
+
+
+
+
+  
 
 (function () {
   const body = document.body;
@@ -938,6 +938,30 @@ function updateDisplay() {
 })();
 
 
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  document.getElementById("recargaPix").addEventListener("click", function () {
+    if (typeof openPaymentModal === "function") {
+      openPaymentModal();
+    }
+  });
 
 
 
