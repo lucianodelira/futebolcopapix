@@ -1,10 +1,10 @@
 .modal-body body {
-    font-family: 'Roboto', sans-serif;
-    text-align: center;
-    padding: 20px;
-    background-color: #ffffff;
-    color: #333;
-  }
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+  padding: 20px;
+  background-color: #ffffff;
+  color: #333;
+}
 
   /* Modal styles */
   .modal-body #paymentModal {
