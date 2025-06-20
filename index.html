@@ -952,7 +952,27 @@ function updateDisplay() {
 
 
 
-
+<script>
+  document.getElementById("recargaPix").addEventListener("click", function () {
+    // Verifica se o script já foi carregado
+    if (!document.getElementById("pix-script-loader")) {
+      const script = document.createElement("script");
+      script.src = "MPayment/script.js";
+      script.id = "pix-script-loader";
+      script.onload = function () {
+        if (typeof openPaymentModal === "function") {
+          openPaymentModal(); // Chama a função após o script carregarAdd commentMore actions
+        }
+      };
+      document.body.appendChild(script);
+    } else {
+      // Se já carregado, apenas chama a função diretamente
+      if (typeof openPaymentModal === "function") {
+        openPaymentModal();
+      }
+    }
+  });
+</script>
 
 
 
