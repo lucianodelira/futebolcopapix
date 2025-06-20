@@ -4,7 +4,23 @@
   <meta charset="UTF-8">
   <title>Copa 2 – Caça-Níquel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="MPayment/Styles.css">
+
+
+
+
+
+<link rel="stylesheet" href="MPayment/Styles.css">
+
+
+
+
+
+
+
+
+
+
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/6.7.0/css/flag-icon.min.css">
   <style>
     * {
@@ -98,25 +114,26 @@
       object-fit: contain;
     }
     .blink {
-      animation: brilho 0.2s infinite alternate, pulseBorder 1s infinite;
-      box-shadow: 0 0 20px 10px gold, 0 0 40px 20px yellow;
-      border: 3px solid gold;
-      z-index: 10;
-    }
-    @keyframes brilho {
-      0% { box-shadow: 0 0 10px 5px gold; border-color: gold; }
-      100% { box-shadow: 0 0 25px 12px red; border-color: red; }
-    }
-    @keyframes pulseBorder {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
+  animation: brilho 0.2s infinite alternate, pulseBorder 1s infinite;
+  box-shadow: 0 0 20px 10px gold, 0 0 40px 20px yellow;
+  border: 3px solid gold;
+  z-index: 10;
+}
+@keyframes brilho {
+  0% { box-shadow: 0 0 10px 5px gold; border-color: gold; }
+  100% { box-shadow: 0 0 25px 12px red; border-color: red; }
+}
+@keyframes pulseBorder {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       25% { transform: translateX(-3px); }
       75% { transform: translateX(3px); }
     }
+
     #betList {
       margin-top: 8px;
       background: #222;
@@ -169,74 +186,110 @@
     #betAmount {
       display: none;
     }
-    #pixButton {
-      margin-top: 8px;
-      width: 100%;
-      height: 35px;
-      background: #007BFF;
-      border: 1px solid #fff;
-      color: white;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 6px;
-      transition: transform 0.2s, background 0.3s;
-    }
-    #pixButton:hover {
-      transform: scale(1.05);
-      background: #005FCC;
-    }
-    #recargaPix {
-      margin-top: 12px;
-      width: 100%;
-      height: 40px;
-      background-color: #00aa00;
-      border: none;
-      color: white;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: background-color 0.3s ease;
-    }
-    #recargaPix:hover {
-      background-color: #008800;
-    }
-    #recargaPix:active {
-      background-color: #006600;
-    }
-    #alertBox {
-      position: fixed;
-      top: 30%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #111;
-      color: white;
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 12px;
-      border: 2px solid;
-      box-shadow: 0 0 16px rgba(255, 255, 255, 0.2);
-      z-index: 999;
-      animation: fadeAlert 2s ease-in-out;
-    }
-    .hidden {
-      display: none;
-    }
-    @keyframes fadeAlert {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-      10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-      90% { opacity: 1; }
-      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-    }
+   #pixButton {
+  margin-top: 8px;
+  width: 100%;
+  height: 35px;
+  background: #007BFF; /* azul padrão */
+  border: 1px solid #fff;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: transform 0.2s, background 0.3s;
+}
+
+#pixButton:hover {
+  transform: scale(1.05);
+  background: #005FCC; /* azul mais escuro no hover */
+}
+
+
+
+
+ #recargaPix {
+    margin-top: 12px;
+    width: 100%;
+    height: 40px;
+    background-color: #00aa00;
+    border: none;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+
+  #recargaPix:hover {
+    background-color: #008800;
+  }
+
+  #recargaPix:active {
+    background-color: #006600;
+  }
+
+
+#alertBox {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #111;
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: 2px solid;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.2);
+  z-index: 999;
+  animation: fadeAlert 2s ease-in-out;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes fadeAlert {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+
+
+
   </style>
+
+
 </head>
 <body>
+
+
+
+
+
+
+
+
+
+
+
 <div id="app">
   <div class="top-bar">
     <div>PRÊMIO: <span id="prize">0</span></div>
     <div>CRÉDITOS: <span id="credits">100</span></div>
+
+
+
+
+
+
+
+
+
   </div>
   <div id="board">
     <div class="slot" style="grid-area:tl"><img src="imagens/br.png" class="flag-img" data-team="br"></div>
@@ -263,8 +316,13 @@
   </div>
   <button id="btnPlay">JOGAR</button>
   <div id="menu">
-    <button id="recargaPix">Recarga via Pix</button>
-    <div id="alertBox" class="hidden"></div>
+ 
+<!-- Botão para abrir o modal e carregar script -->
+<button id="recargaPix">Recarga via Pix</button>
+
+<div id="alertBox" class="hidden"></div>
+
+
     <hr>
     <label>Escolher Time:</label>
     <div id="teamButtons">
@@ -290,9 +348,12 @@
     <input type="number" id="betAmount" placeholder="1-5" min="1" max="5">
     <div id="betList"></div>
     <div style="display: flex; justify-content: space-between; gap: 10px;">
-      <button id="pixButton" style="flex: 1;">💸 Sacar via Pix</button>
-    </div>
+  <button id="pixButton" style="flex: 1;">💸 Sacar via Pix</button>
+
+</div>
+
   </div>
+  <!-- Elementos de áudio -->
   <audio id="backgroundSound" src="sons/background.mp3" loop autoplay></audio>
   <audio id="clickSound" src="sons/click.mp3"></audio>
   <audio id="spinSound" src="sons/spin.mp3"></audio>
@@ -300,29 +361,241 @@
   <audio id="loseSound" src="sons/lose.mp3"></audio>
 </div>
 <script>
+
+
+
+
+
+
+
+
+
+
 let credits = parseInt(localStorage.getItem('credits')) || 0;
 let prize = parseInt(localStorage.getItem('prize')) || 0;
-let bets = {};
 
-const creditsEl = document.getElementById('credits');
-const prizeEl = document.getElementById('prize');
-const btnPlay = document.getElementById('btnPlay');
-const slots = Array.from(document.querySelectorAll('.slot'));
-const betList = document.getElementById('betList');
-const teamButtons = document.querySelectorAll('.teamButton');
-const pixButton = document.getElementById('pixButton');
-const backgroundSound = document.getElementById('backgroundSound');
-const clickSound = document.getElementById('clickSound');
-const spinSound = document.getElementById('spinSound');
-const winSound = document.getElementById('winSound');
-const loseSound = document.getElementById('loseSound');
 
-backgroundSound.volume = 0.4;
 
-document.addEventListener('click', () => {
-  backgroundSound.play().catch(() => {});
-}, { once: true });
 
+  let bets = {};
+
+  const creditsEl = document.getElementById('credits');
+  const prizeEl = document.getElementById('prize');
+  const btnPlay = document.getElementById('btnPlay');
+  const slots = Array.from(document.querySelectorAll('.slot'));
+  const betList = document.getElementById('betList');
+  const teamButtons = document.querySelectorAll('.teamButton');
+  const pixButton = document.getElementById('pixButton');
+  const backgroundSound = document.getElementById('backgroundSound');
+  const clickSound = document.getElementById('clickSound');
+  const spinSound = document.getElementById('spinSound');
+  const winSound = document.getElementById('winSound');
+  const loseSound = document.getElementById('loseSound');
+
+  // Configura o volume da trilha de fundo
+  backgroundSound.volume = 0.4;
+
+  // Inicia a trilha de fundo na primeira interação para contornar restrições de autoplay
+ 
+ document.addEventListener('click', () => {
+    backgroundSound.play().catch(() => {});
+  }, { once: true });
+
+
+ function updateDisplay() {
+    creditsEl.textContent = credits;
+    prizeEl.textContent = prize;
+
+  
+
+    betList.innerHTML = Object.entries(bets).map(([team, val]) => {
+      return `
+        <div class="bet-item" data-team="${team}" style="display: inline-block; width: 40px; margin: 2px; background: #000; border: 1px solid #fff; border-radius: 4px; padding: 2px;">
+          <img src="imagens/${team}.png" style="width: 100%; height: 24px; object-fit: contain;">
+          <div style="color: yellow; font-size: 10px;">${val}</div>
+        </div>
+      `;
+    }).join('');
+
+
+
+    // Adiciona evento de clique aos itens de aposta
+    document.querySelectorAll('.bet-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const team = item.dataset.team;
+        removeBet(team);
+      });
+    });
+  }
+
+  function save() {
+    localStorage.setItem('credits', credits);
+    localStorage.setItem('prize', prize);
+  }
+
+  function addCredits() {
+    let val = parseInt(document.getElementById('addCredit').value);
+    if (!isNaN(val) && val > 0) {
+      credits += val;
+      save();
+      updateDisplay();
+    }
+  }
+
+  function placeBet(team = null, val = null) {
+    const selectedTeam = team || document.getElementById('betTeam')?.value;
+    const betValue = val || parseInt(document.getElementById('betAmount').value);
+    if (!selectedTeam || isNaN(betValue) || betValue < 1 || betValue > 5) return alert('Escolha time e valor de 1 a 5');
+    if (!bets[selectedTeam] && Object.keys(bets).length >= 5) return alert('Máximo 5 times por rodada');
+    const totalBet = (bets[selectedTeam] || 0) + betValue;
+    if (totalBet > 5) return alert('Máximo 5 créditos por time');
+    if (credits < betValue) return alert('Créditos insuficientes');
+
+    bets[selectedTeam] = totalBet;
+    credits -= betValue;
+    clickSound.play().catch(() => {});
+    save();
+    updateDisplay();
+  }
+
+  function removeBet(team) {
+    if (bets[team]) {
+      bets[team] -= 1;
+      credits += 1;
+      if (bets[team] === 0) {
+        delete bets[team];
+      }
+      clickSound.play().catch(() => {});
+      save();
+      updateDisplay();
+    }
+  }
+
+  teamButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const team = button.dataset.team;
+      const betValue = parseInt(document.getElementById('betAmount').value) || 1;
+      placeBet(team, betValue);
+    });
+  });
+
+  pixButton.addEventListener('click', () => {
+    alert('Você não possui saldo para retirada');
+  });
+
+  btnPlay.onclick = () => {
+    if (Object.keys(bets).length === 0) return alert('Nenhuma aposta feita');
+    btnPlay.disabled = true;
+spinSound.play().catch(() => {});
+slots.forEach(s => s.classList.remove('blink'));
+
+let count = 0;
+const flashes = 40 + Math.floor(Math.random() * 15);
+
+// Lista de times apostados
+const betTeams = Object.keys(bets);
+
+// Filtra apenas os slots que NÃO estão nas apostas
+const safeSlots = slots.filter(slot => {
+  const team = slot.querySelector('img')?.dataset.team;
+  return !betTeams.includes(team);
+});
+
+// Se não houver slots seguros, sorteia aleatoriamente de qualquer forma
+const slotPool = safeSlots.length > 0 ? safeSlots : slots;
+
+let finalSlot = null;
+
+const interval = setInterval(() => {
+  slots.forEach(s => s.classList.remove('blink'));
+  const idx = Math.floor(Math.random() * slotPool.length);
+  const slot = slotPool[idx];
+  slot.classList.add('blink');
+  finalSlot = slot;
+  if (++count > flashes) {
+    clearInterval(interval);
+
+    const winner = finalSlot.querySelector('img').dataset.team;
+    const win = bets[winner] ? bets[winner] * 5 : 0;
+
+    prize += win;
+    credits += win;
+    bets = {};
+    save();
+    updateDisplay();
+
+    if (win) {
+      winSound.play().catch(() => {});
+      showAlert(`🏆 GANHOU ${win} CRÉDITOS!`, '#FFD700');
+    } else {
+      loseSound.play().catch(() => {});
+      showAlert('😢 NÃO FOI DESSA VEZ', '#ff4444');
+    }
+
+    btnPlay.disabled = false;
+  }
+}, 100);
+  };
+
+  updateDisplay();
+
+
+
+
+
+
+
+
+
+
+function showAlert(message, borderColor) {
+  const alertBox = document.getElementById('alertBox');
+  alertBox.textContent = message;
+  alertBox.style.borderColor = borderColor;
+  alertBox.classList.remove('hidden');
+
+  setTimeout(() => {
+    alertBox.classList.add('hidden');
+  }, 2000);
+}
+
+
+
+
+
+
+
+  pixButton.addEventListener('click', () => {
+    alert('Você não possui saldo para retirada');
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Função para atualizar a URL apenas uma vez
+function refreshPageWithUrlUpdate() {
+  if (!localStorage.getItem('urlUpdated')) {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('no-credits', 'true');
+    localStorage.setItem('urlUpdated', 'true'); // marca como atualizada
+    window.location.href = currentUrl.toString();
+  }
+}
+
+// Atualiza display e controla botão de recarga
 function updateDisplay() {
   creditsEl.textContent = credits;
   prizeEl.textContent = prize;
@@ -343,172 +616,128 @@ function updateDisplay() {
     });
   });
 
+  // Controle do botão Recarga via Pix
   const recargaBtn = document.getElementById('recargaPix');
   if (credits <= 0) {
     if (!recargaBtn.classList.contains('hidden')) {
-      refreshPageWithUrlUpdate();
+      refreshPageWithUrlUpdate(); // Atualiza a URL apenas 1x
     }
     recargaBtn.classList.remove('hidden');
   } else {
     recargaBtn.classList.add('hidden');
-    localStorage.removeItem('urlUpdated');
+    localStorage.removeItem('urlUpdated'); // reseta a flag se tiver crédito
   }
 }
 
-function save() {
-  localStorage.setItem('credits', credits);
-  localStorage.setItem('prize', prize);
-}
 
-function addCredits() {
-  let val = parseInt(document.getElementById('addCredit').value);
-  if (!isNaN(val) && val > 0) {
-    credits += val;
-    save();
-    updateDisplay();
+
+
+
+
+// Função para atualizar URL (recarregar página)
+  function reloadPage() {
+    // Se quiser atualizar URL adicionando parâmetro, pode fazer aqui, por exemplo:
+    // const url = new URL(window.location.href);
+    // url.searchParams.set('modalClosed', 'true');
+    // window.location.href = url.toString();
+
+    // Ou simplesmente recarregar a página:
+    location.reload();
   }
-}
 
-function placeBet(team = null, val = null) {
-  const selectedTeam = team || document.getElementById('betTeam')?.value;
-  const betValue = val || parseInt(document.getElementById('betAmount').value);
-  if (!selectedTeam || isNaN(betValue) || betValue < 1 || betValue > 5) return alert('Escolha time e valor de 1 a 5');
-  if (!bets[selectedTeam] && Object.keys(bets).length >= 5) return alert('Máximo 5 times por rodada');
-  const totalBet = (bets[selectedTeam] || 0) + betValue;
-  if (totalBet > 5) return alert('Máximo 5 créditos por time');
-  if (credits < betValue) return alert('Créditos insuficientes');
+  // Aguarda DOM estar pronto
+  document.addEventListener('DOMContentLoaded', () => {
+    // Se o modal tem id #paymentModal (ou mude para o id correto do seu modal)
+    const modalId = 'paymentModal';
 
-  bets[selectedTeam] = totalBet;
-  credits -= betValue;
-  clickSound.play().catch(() => {});
-  save();
-  updateDisplay();
-}
+    const body = document.body;
 
-function removeBet(team) {
-  if (bets[team]) {
-    bets[team] -= 1;
-    credits += 1;
-    if (bets[team] === 0) {
-      delete bets[team];
-    }
-    clickSound.play().catch(() => {});
-    save();
-    updateDisplay();
-  }
-}
+    // Configura MutationObserver para observar remoção/adição do modal no DOM
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach(mutation => {
+        mutation.removedNodes.forEach(removed => {
+          if (removed.id === modalId) {
+            // Modal foi removido -> recarrega a página
+            reloadPage();
+          }
+        });
 
-teamButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const team = button.dataset.team;
-    const betValue = parseInt(document.getElementById('betAmount').value) || 1;
-    placeBet(team, betValue);
-  });
-});
-
-pixButton.addEventListener('click', () => {
-  alert('Você não possui saldo para retirada');
-});
-
-btnPlay.onclick = () => {
-  if (Object.keys(bets).length === 0) return alert('Nenhuma aposta feita');
-  btnPlay.disabled = true;
-  spinSound.play().catch(() => {});
-  slots.forEach(s => s.classList.remove('blink'));
-
-  let count = 0;
-  const flashes = 40 + Math.floor(Math.random() * 15);
-  const betTeams = Object.keys(bets);
-  const safeSlots = slots.filter(slot => {
-    const team = slot.querySelector('img')?.dataset.team;
-    return !betTeams.includes(team);
-  });
-  const slotPool = safeSlots.length > 0 ? safeSlots : slots;
-  let finalSlot = null;
-
-  const interval = setInterval(() => {
-    slots.forEach(s => s.classList.remove('blink'));
-    const idx = Math.floor(Math.random() * slotPool.length);
-    const slot = slotPool[idx];
-    slot.classList.add('blink');
-    finalSlot = slot;
-    if (++count > flashes) {
-      clearInterval(interval);
-      const winner = finalSlot.querySelector('img').dataset.team;
-      const win = bets[winner] ? bets[winner] * 5 : 0;
-      prize += win;
-      credits += win;
-      bets = {};
-      save();
-      updateDisplay();
-      if (win) {
-        winSound.play().catch(() => {});
-        showAlert(`🏆 GANHOU ${win} CRÉDITOS!`, '#FFD700');
-      } else {
-        loseSound.play().catch(() => {});
-        showAlert('😢 NÃO FOI DESSA VEZ', '#ff4444');
-      }
-      btnPlay.disabled = false;
-    }
-  }, 100);
-};
-
-function showAlert(message, borderColor) {
-  const alertBox = document.getElementById('alertBox');
-  alertBox.textContent = message;
-  alertBox.style.borderColor = borderColor;
-  alertBox.classList.remove('hidden');
-  setTimeout(() => {
-    alertBox.classList.add('hidden');
-  }, 2000);
-}
-
-function refreshPageWithUrlUpdate() {
-  if (!localStorage.getItem('urlUpdated')) {
-    const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set('no-credits', 'true');
-    localStorage.setItem('urlUpdated', 'true');
-    window.location.href = currentUrl.toString();
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const modalId = 'paymentModal';
-  const body = document.body;
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach(mutation => {
-      mutation.removedNodes.forEach(removed => {
-        if (removed.id === modalId) {
-          location.reload();
-        }
-      });
-      mutation.addedNodes.forEach(added => {
-        if (added.id === modalId) {
-          observeModalVisibility(added);
-        }
+        mutation.addedNodes.forEach(added => {
+          if (added.id === modalId) {
+            // Modal adicionado, podemos monitorar se ele fica oculto
+            observeModalVisibility(added);
+          }
+        });
       });
     });
-  });
-  observer.observe(body, { childList: true });
-  const existingModal = document.getElementById(modalId);
-  if (existingModal) {
-    observeModalVisibility(existingModal);
-  }
-  function observeModalVisibility(modalElement) {
-    const visibilityObserver = new MutationObserver(() => {
-      const style = window.getComputedStyle(modalElement);
-      if (style.display === 'none' || style.visibility === 'hidden' || modalElement.hidden) {
-        location.reload();
-        visibilityObserver.disconnect();
-      }
-    });
-    visibilityObserver.observe(modalElement, { attributes: true, attributeFilter: ['style', 'hidden'] });
-  }
-});
 
+    observer.observe(body, { childList: true });
+
+    // Se o modal já estiver na página no início
+    const existingModal = document.getElementById(modalId);
+    if (existingModal) {
+      observeModalVisibility(existingModal);
+    }
+
+    // Função que observa quando modal fica oculto (display:none)
+    function observeModalVisibility(modalElement) {
+      const visibilityObserver = new MutationObserver(() => {
+        const style = window.getComputedStyle(modalElement);
+        if (style.display === 'none' || style.visibility === 'hidden' || modalElement.hidden) {
+          // Modal oculto -> recarrega a página
+          reloadPage();
+          visibilityObserver.disconnect();
+        }
+      });
+
+      visibilityObserver.observe(modalElement, { attributes: true, attributeFilter: ['style', 'hidden'] });
+    }
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 (function () {
   const body = document.body;
-  body.classList.add('modal-body');
+  body.classList.add('modal-body'); // Adiciona classe exclusiva ao body
+
   const modalHTML = `
     <div id="paymentModal">
       <div id="modalContent">
@@ -577,6 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function bindModalEvents() {
     const closeModalButton = document.querySelector('.closeModal');
     if (closeModalButton) closeModalButton.onclick = closeModal;
+
     const copyButton = document.getElementById('copyButton');
     if (copyButton) copyButton.onclick = copyToClipboard;
   }
@@ -600,10 +830,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const qrCodeImage = document.getElementById('qrCode');
     const pixKey = document.getElementById('pixKey');
     const pixKeySection = document.getElementById('pixKeySection');
+
     qrCodeImage.src = `data:image/png;base64,${data.qrCodeBase64}`;
     qrCodeImage.style.display = 'block';
     pixKey.textContent = data.qrCodePix;
     pixKeySection.style.display = 'block';
+
     openModal();
     document.getElementById('status').textContent = 'Pagamento pendente!';
   }
@@ -611,16 +843,20 @@ document.addEventListener('DOMContentLoaded', () => {
   async function createPayment() {
     const statusElement = document.getElementById('status');
     const spinner = document.getElementById('loadingSpinner');
+
     spinner.style.display = 'block';
     statusElement.textContent = 'Gerando pagamento, aguarde...';
+
     try {
       const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=createPayment`);
       const data = await response.json();
+
       if (data.success) {
         savePayment(data);
         const qrCodeImage = document.getElementById('qrCode');
         const pixKey = document.getElementById('pixKey');
         const pixKeySection = document.getElementById('pixKeySection');
+
         qrCodeImage.src = `data:image/png;base64,${data.qrCodeBase64}`;
         qrCodeImage.style.display = 'block';
         pixKey.textContent = data.qrCodePix;
@@ -628,6 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
         spinner.style.display = 'none';
         statusElement.textContent = 'Pagamento gerado com sucesso!';
         paymentId = data.paymentId;
+
         checkPaymentStatus(paymentId);
       } else {
         spinner.style.display = 'none';
@@ -640,32 +877,51 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function checkPaymentStatus(paymentId) {
-    try {
-      const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getPaymentStatus&paymentId=${paymentId}`);
-      const data = await response.json();
-      if (data.success) {
-        if (data.status === 'approved') {
-          let currentCredits = parseInt(localStorage.getItem('credits')) || 0;
-          let newCredits = currentCredits + 18;
-          localStorage.setItem('credits', newCredits);
-          localStorage.setItem('privilegeAccess', 'true');
-          localStorage.removeItem(PAYMENT_STORAGE_KEY);
-          showSuccessMessage();
-          const newUrl = window.location.origin + window.location.pathname;
-          window.history.replaceState(null, '', newUrl);
-          location.reload();
-        } else if (data.status === 'pending') {
-          setTimeout(() => checkPaymentStatus(paymentId), 5000);
-        } else {
-          document.getElementById('statusMessage').textContent = `Status do pagamento: ${data.statusDetail}`;
-        }
+  try {
+    const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getPaymentStatus&paymentId=${paymentId}`);
+    const data = await response.json();
+
+    if (data.success) {
+      if (data.status === 'approved') {
+        // Adiciona créditos
+        let currentCredits = parseInt(localStorage.getItem('credits')) || 0;
+        let newCredits = currentCredits + 18;
+        localStorage.setItem('credits', newCredits);
+
+        // Sinaliza privilégio e remove dados antigos do pagamento
+        localStorage.setItem('privilegeAccess', 'true');
+        localStorage.removeItem(PAYMENT_STORAGE_KEY);
+
+        // Mostra mensagem de sucesso no modal
+        showSuccessMessage();
+
+        // Atualiza a URL para remover query params (opcional)
+        const newUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState(null, '', newUrl);
+
+        // Recarrega para atualizar a interface com os novos créditos
+        location.reload();
+
+      } else if (data.status === 'pending') {
+        setTimeout(() => checkPaymentStatus(paymentId), 5000);
       } else {
-        document.getElementById('statusMessage').textContent = `Erro: ${data.message}`;
+        document.getElementById('statusMessage').textContent = `Status do pagamento: ${data.statusDetail}`;
       }
-    } catch (error) {
-      document.getElementById('statusMessage').textContent = `Erro na conexão: ${error.message}`;
+    } else {
+      document.getElementById('statusMessage').textContent = `Erro: ${data.message}`;
     }
+  } catch (error) {
+    document.getElementById('statusMessage').textContent = `Erro na conexão: ${error.message}`;
   }
+}
+
+
+
+
+
+
+
+
 
   function showSuccessMessage() {
     const modalContent = document.getElementById('modalInnerContent');
@@ -689,13 +945,123 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })();
 
-document.getElementById("recargaPix").addEventListener("click", function () {
-  if (typeof openPaymentModal === "function") {
-    openPaymentModal();
-  }
-});
 
-updateDisplay();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function createModal() {
+    // Container do modal
+    const modalContainer = document.createElement('div');
+    modalContainer.id = 'modal-container';
+    modalContainer.style.position = 'fixed';
+    modalContainer.style.top = '0';
+    modalContainer.style.left = '0';
+    modalContainer.style.width = '100%';
+    modalContainer.style.height = '100%';
+    modalContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    modalContainer.style.display = 'flex';
+    modalContainer.style.justifyContent = 'center';
+    modalContainer.style.alignItems = 'center';
+    modalContainer.style.zIndex = '1000';
+
+    // Conteúdo do modal
+    const modalContent = document.createElement('div');
+    modalContent.style.width = '400px';
+    modalContent.style.padding = '20px';
+    modalContent.style.backgroundColor = '#fff';
+    modalContent.style.borderRadius = '10px';
+    modalContent.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.3)';
+    modalContent.style.textAlign = 'center';
+    modalContent.style.fontFamily = 'Arial, sans-serif';
+    modalContent.style.color = '#333';
+
+    // Mensagem no modal
+    const message = document.createElement('div');
+    message.innerHTML = `
+        <h2 style="color: #191970; font-size: 24px; margin-bottom: 10px;">🎯 Loto Hack: O Melhor Palpite para o Jogo do Bicho!</h2>
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 15px;">Aposte com inteligência e aumente suas chances de ganhar!<br>Nosso sistema avançado analisa os resultados para descobrir números com as maiores probabilidades de serem sorteados!</p>
+        <h3 style="color: #1d3557; font-size: 20px; margin-bottom: 10px;">🛒 Por apenas R$ 18,00</h3>
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 15px;">🤏🏼 Pagamento único!<br>✔️ Acesso vitalício!</p>
+        <p style="font-weight: bold; font-size: 16px; margin-top: 15px;">👉 Transforme sua sorte em estratégia. Seja Loto Hack! 🍀</p><br><br>
+    `;
+    modalContent.appendChild(message);
+
+    // Botão para desbloquear acesso
+    const unlockButton = document.createElement('button');
+    unlockButton.textContent = 'Desbloquear acesso';
+    unlockButton.style.padding = '10px 20px';
+    unlockButton.style.backgroundColor = '#28a745';
+    unlockButton.style.color = '#fff';
+    unlockButton.style.border = 'none';
+    unlockButton.style.borderRadius = '25px';
+    unlockButton.style.cursor = 'pointer';
+    unlockButton.style.marginBottom = '15px';
+    unlockButton.style.fontSize = '16px';
+    unlockButton.style.fontWeight = 'bold';
+    unlockButton.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    unlockButton.addEventListener('click', () => {
+        document.body.removeChild(modalContainer);
+	openPaymentModal()
+    });
+    modalContent.appendChild(unlockButton);
+
+    // Link para fechar o modal
+    const closeLink = document.createElement('a');
+    closeLink.textContent = 'Fechar';
+    closeLink.style.display = 'block';
+    closeLink.style.marginTop = '20px';
+    closeLink.style.color = '#6200ea';
+    closeLink.style.textDecoration = 'none';
+    closeLink.style.cursor = 'pointer';
+    closeLink.style.fontSize = '16px';
+    closeLink.addEventListener('click', () => {
+        document.body.removeChild(modalContainer);
+    });
+    modalContent.appendChild(closeLink);
+
+    // Adiciona o conteúdo ao container e o container ao body
+    modalContainer.appendChild(modalContent);
+    document.body.appendChild(modalContainer);
+}
 </script>
+
+
+
+
+
+
+
+
+<script>
+  document.getElementById("recargaPix").addEventListener("click", function () {
+    if (typeof openPaymentModal === "function") {
+      openPaymentModal();
+    }
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
