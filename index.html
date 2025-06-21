@@ -455,6 +455,22 @@ let prize = parseInt(localStorage.getItem('prize')) || 0;
     updateDisplay();
   }
 
+
+
+// Esconde o botão de recarga se ainda houver créditos
+const recargaBtn = document.getElementById('recargaPix');
+if (credits > 0) {
+  recargaBtn.classList.add('hidden');
+}
+
+
+
+
+
+
+
+
+
   function removeBet(team) {
     if (bets[team]) {
       bets[team] -= 1;
@@ -528,6 +544,40 @@ const interval = setInterval(() => {
       loseSound.play().catch(() => {});
       showAlert('😢 NÃO FOI DESSA VEZ', '#ff4444');
     }
+
+
+
+
+
+
+ // Mostra botão de recarga APENAS se o jogador ficou com 0 créditos após jogar
+    const recargaBtn = document.getElementById('recargaPix');
+    if (credits <= 0) {
+      recargaBtn.classList.remove('hidden');
+
+      if (!localStorage.getItem('urlUpdated')) {
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('no-credits', 'true');
+        localStorage.setItem('urlUpdated', 'true');
+        history.replaceState(null, '', currentUrl.toString());
+      }
+    } else {
+      recargaBtn.classList.add('hidden');
+      localStorage.removeItem('urlUpdated');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     btnPlay.disabled = false;
   }
@@ -613,17 +663,8 @@ function updateDisplay() {
     });
   });
 
-  // Controle do botão Recarga via Pix
-  const recargaBtn = document.getElementById('recargaPix');
-  if (credits <= 0) {
-    if (!recargaBtn.classList.contains('hidden')) {
-      refreshPageWithUrlUpdate(); // Atualiza a URL apenas 1x
-    }
-    recargaBtn.classList.remove('hidden');
-  } else {
-    recargaBtn.classList.add('hidden');
-    localStorage.removeItem('urlUpdated'); // reseta a flag se tiver crédito
-  }
+  
+
 }
 
 
