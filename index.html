@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <title>Copa 2 – Caça-Níquel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4CAF50">
 
 
 
@@ -788,7 +789,13 @@ function updateDisplay() {
   <p style="font-size: 10px; margin-top: 6px;">Use <strong>Recarga via Pix</strong> se os créditos acabarem.</p>
 </div>
 
-
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(reg => console.log('[SW] Registrado:', reg))
+      .catch(err => console.error('[SW] Falha no registro:', err));
+  }
+</script>
 
 </body>
 </html>
