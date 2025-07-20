@@ -779,7 +779,37 @@ function updateDisplay() {
 
 <script src="MPayment/Modal.js"></script>
 
+<div id="pwa-install-prompt" style="background: #4CAF50; color: white; padding: 15px; text-align: center; font-size: 16px; display: none;">
+  📱 Deseja ter acesso rápido? <strong>Adicione o Brasileirão à sua tela inicial</strong> e aproveite como um app!
+  <button onclick="installPWA()" style="margin-left: 10px; padding: 8px 12px; background: white; color: #4CAF50; border: none; border-radius: 5px;">Instalar</button>
+</div>
+<script>
+  let deferredPrompt;
 
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('pwa-install-prompt').style.display = 'block';
+  });
+
+  function installPWA() {
+    document.getElementById('pwa-install-prompt').style.display = 'none';
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('[PWA] Usuário aceitou instalar o app');
+        } else {
+          console.log('[PWA] Usuário recusou instalar o app');
+        }
+        deferredPrompt = null;
+      });
+    }
+  }
+</script>
+
+
+  
 <div id="apresentacao" style="width: 95%; margin: 12px auto; padding: 8px; background: #fff; border-radius: 8px; box-shadow: 0 0 6px rgba(0,0,0,0.15); font-family: sans-serif;">
   <h2 style="color: #179800; font-size: 14px; margin: 0 0 6px;">🎮 Como Jogar – Brasileirão Caça-Níquel</h2>
   <p style="font-size: 12px; margin: 4px 0;"><strong>1.</strong> Escolha até <strong>5 times</strong> clicando nos escudos.</p>
