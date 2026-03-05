@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>🎰 Roleta Premiada</title>
 
 <style>
@@ -15,18 +13,37 @@ background:#0d0d0d;
 font-family:Arial;
 text-align:center;
 color:white;
+overflow-x:hidden;
 }
 
 #app{
 max-width:420px;
 margin:auto;
-padding:20px;
+padding:15px;
 }
 
 h1{
 color:#ffd700;
+margin:10px 0;
 text-shadow:0 0 10px #ffd700;
 }
+
+#saldoArea{
+display:flex;
+justify-content:space-around;
+margin:15px 0;
+font-size:20px;
+}
+
+.credito-box{
+background:#222;
+padding:10px 20px;
+border-radius:10px;
+border:2px solid #444;
+}
+
+.credito{color:#00ff9c;font-weight:bold;}
+.premio{color:#ffcc00;font-weight:bold;}
 
 .roletaBox{
 position:relative;
@@ -35,10 +52,37 @@ height:320px;
 margin:20px auto;
 }
 
+/* BRILHO GIRANDO */
+
+.roletaBox::before{
+content:"";
+position:absolute;
+width:360px;
+height:360px;
+border-radius:50%;
+background:conic-gradient(
+transparent,
+rgba(255,215,0,0.4),
+transparent
+);
+animation:brilho 4s linear infinite;
+top:-20px;
+left:-20px;
+z-index:0;
+}
+
+@keyframes brilho{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
 #wheel{
 width:100%;
 height:100%;
-transition:transform 5s cubic-bezier(0.17,0.67,0.12,0.99);
+transition:transform 5.8s cubic-bezier(0.17,0.67,0.12,0.99);
+transform-origin:center;
+position:relative;
+z-index:1;
 }
 
 .pointer{
@@ -46,31 +90,91 @@ width:0;
 height:0;
 border-left:15px solid transparent;
 border-right:15px solid transparent;
-border-top:30px solid red;
+border-top:32px solid red;
 position:absolute;
-top:-15px;
+top:-20px;
 left:50%;
 transform:translateX(-50%);
+z-index:10;
 }
 
 button{
-padding:15px;
-font-size:20px;
+padding:14px 28px;
+font-size:18px;
+margin:10px 5px;
 border:none;
 border-radius:10px;
-background:#ffd700;
-color:black;
-width:100%;
+font-weight:bold;
 cursor:pointer;
 }
 
+#giraBtn{
+background:#ffd700;
+color:#000;
+width:100%;
+}
+
+.recargaBtn{
+width:100%;
+height:50px;
+background:#00aa00;
+color:white;
+font-size:20px;
+border-radius:10px;
+margin:15px 0;
+}
+
+#sacarBtn{
+background:#ff6600;
+color:white;
+display:none;
+width:100%;
+height:50px;
+font-size:18px;
+}
+
 #resultado{
-margin-top:20px;
-font-size:25px;
+margin:20px 0;
+font-size:26px;
+min-height:40px;
 font-weight:bold;
 }
 
+/* EXPLOSÃO DE MOEDAS */
+
+#coinsExplosion{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+pointer-events:none;
+z-index:999;
+}
+
+.coin{
+position:absolute;
+font-size:30px;
+animation:coinFall 1.8s ease-out forwards;
+}
+
+@keyframes coinFall{
+
+0%{
+transform:translateY(-100px) scale(0.5) rotate(0deg);
+opacity:1;
+}
+
+100%{
+transform:translateY(500px) scale(1.2) rotate(720deg);
+opacity:0;
+}
+
+}
+
 </style>
+
+<link rel="stylesheet" href="MPayment/Styles.css">
 
 </head>
 
@@ -80,38 +184,94 @@ font-weight:bold;
 
 <h1>🎰 Roleta Premiada</h1>
 
-<div class="roletaBox">
+<div id="saldoArea">
 
-<div class="pointer"></div>
+<div class="credito-box">
+Créditos: R$ <span id="valorCreditos" class="credito">0.00</span>
+</div>
 
-<canvas id="wheel" width="320" height="320"></canvas>
+<div class="credito-box">
+Prêmios: R$ <span id="valorPremios" class="premio">0.00</span>
+</div>
 
 </div>
 
-<button onclick="girar()">GIRAR</button>
+<div class="roletaBox">
+<div class="pointer"></div>
+<canvas id="wheel" width="320" height="320"></canvas>
+</div>
+
+<button id="giraBtn" onclick="girar()">GIRAR (custa R$1)</button>
 
 <div id="resultado"></div>
 
+<button class="recargaBtn" id="recargaPixBtn">Recarga via Pix</button>
+
+<button id="sacarBtn" onclick="solicitarSaque()">Sacar Prêmios</button>
+
+<button onclick="adicionar18Creditos()" style="background:#0099ff;color:white;width:100%;height:45px;">
+Adicionar 18 Créditos
+</button>
+
 </div>
+
+<div id="coinsExplosion"></div>
 
 <script>
 
-const API="https://script.google.com/macros/s/AKfycbwN_2mY4Ht9FCkr7iVL8AtU-Fl-gSn8bY1_9kPhMqui0xBs5s2N54SDdutgkTkCE40VTQ/exec";
+/* SONS */
+
+const somClick = new Audio("sons/click.mp3");
+const somSpin = new Audio("sons/spi.mp3");
+const somWin = new Audio("sons/win.mp3");
+const somLose = new Audio("sons/lose.mp3");
+const somBg = new Audio("sons/background.mp3");
+
+somBg.loop=true;
+somBg.volume=0.3;
+
+document.body.addEventListener("click",()=>{
+somBg.play().catch(()=>{});
+},{once:true});
+
+/* SALDO */
+
+let creditos = parseInt(localStorage.getItem('credits')) || 0;
+let premios = parseFloat(localStorage.getItem("premiosRoleta")) || 0;
+
+document.getElementById("valorCreditos").innerText = creditos.toFixed(2);
+document.getElementById("valorPremios").innerText = premios.toFixed(2);
+
+function atualizarCreditos(){
+localStorage.setItem('credits',creditos);
+document.getElementById("valorCreditos").innerText=creditos.toFixed(2);
+}
+
+function atualizarPremios(){
+localStorage.setItem("premiosRoleta",premios);
+document.getElementById("valorPremios").innerText=premios.toFixed(2);
+}
+
+function atualizarSaqueBtn(){
+document.getElementById("sacarBtn").style.display=premios>0?"block":"none";
+}
+
+atualizarSaqueBtn();
+
+/* ROLETA */
 
 const canvas=document.getElementById("wheel");
 const ctx=canvas.getContext("2d");
 
-const premios=[
-0,0,0,0,0,0,0,0,
-5,5,5,5,
+const premiosLista=[
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+5,5,5,5,5,5,
 10,10,10,
 20,20,
-50,
-100,
-200,
-500,
-1000
+50,100,200,500,1000
 ];
+
+premiosLista.sort(()=>Math.random()-0.5);
 
 const cores=[
 "#333","#444","#555","#666",
@@ -120,11 +280,11 @@ const cores=[
 "#ffaa00","#ffd700","#ff8800","#ff5500"
 ];
 
-const fatia=(Math.PI*2)/premios.length;
+const fatia=(Math.PI*2)/premiosLista.length;
 
-function desenhar(){
+function desenharRoleta(){
 
-for(let i=0;i<premios.length;i++){
+for(let i=0;i<premiosLista.length;i++){
 
 ctx.beginPath();
 ctx.moveTo(160,160);
@@ -141,6 +301,7 @@ ctx.fillStyle=cores[i%cores.length];
 ctx.fill();
 
 ctx.strokeStyle="#111";
+ctx.lineWidth=2;
 ctx.stroke();
 
 ctx.save();
@@ -149,10 +310,10 @@ ctx.translate(160,160);
 ctx.rotate(fatia*i+fatia/2);
 
 ctx.fillStyle="white";
-ctx.font="bold 14px Arial";
+ctx.font="bold 16px Arial";
 ctx.textAlign="center";
 
-ctx.fillText("R$"+premios[i],90,5);
+ctx.fillText("R$"+premiosLista[i],85,6);
 
 ctx.restore();
 
@@ -160,49 +321,311 @@ ctx.restore();
 
 }
 
-desenhar();
+desenharRoleta();
 
+let girando=false;
 let rotacaoAtual=0;
 
-async function girar(){
+/* EXPLOSÃO DE MOEDAS */
 
-document.getElementById("resultado").innerText="Girando...";
+function explosaoMoedas(){
 
-let resposta=await fetch(API);
+const container=document.getElementById("coinsExplosion");
 
-let dados=await resposta.json();
+for(let i=0;i<25;i++){
 
-let premio=dados.premio;
+const coin=document.createElement("div");
 
-let voltas=Math.floor(Math.random()*6)+8;
+coin.className="coin";
 
-let anguloExtra=Math.random()*360;
+coin.innerHTML="💰";
 
-let rotacaoFinal=rotacaoAtual+(voltas*360)+anguloExtra;
+coin.style.left=Math.random()*100+"%";
+
+coin.style.animationDelay=(Math.random()*0.3)+"s";
+
+container.appendChild(coin);
+
+setTimeout(()=>coin.remove(),1800);
+
+}
+
+}
+
+/* GIRAR */
+
+function girar(){
+
+if(girando)return;
+
+somClick.play();
+
+if(creditos<1){
+
+alert("Créditos insuficientes! Recarregue via Pix.");
+return;
+
+}
+
+creditos-=1;
+atualizarCreditos();
+
+girando=true;
+
+somSpin.play();
+
+document.getElementById("resultado").innerText="";
+
+const voltas=Math.floor(Math.random()*5)+10;
+
+const anguloExtra=Math.random()*360;
+
+const rotacaoFinal=rotacaoAtual+(voltas*360)+anguloExtra;
 
 canvas.style.transform=`rotate(${rotacaoFinal}deg)`;
 
 rotacaoAtual=rotacaoFinal;
 
-setTimeout(()=>{
+setTimeout(finalizarGiro,6200);
 
-if(premio>0){
+}
 
-document.getElementById("resultado").innerText=
-"🎉 Você ganhou R$"+premio;
+/* RESULTADO */
+
+function finalizarGiro(){
+
+girando=false;
+
+let anguloFinal = rotacaoAtual % 360;
+if(anguloFinal<0) anguloFinal+=360;
+
+const anguloPorSetor = 360/premiosLista.length;
+
+let anguloSeta = (270 - anguloFinal + 360) % 360;
+
+let setorIndex = Math.floor(anguloSeta / anguloPorSetor);
+
+let premioGanho = premiosLista[setorIndex];
+
+premios += premioGanho;
+atualizarPremios();
+
+if(premioGanho>0){
+
+somWin.play();
+explosaoMoedas();
+
+document.getElementById("resultado").innerText=`🎉 GANHOU R$${premioGanho}!`;
 
 }else{
 
-document.getElementById("resultado").innerText=
-"😢 Não ganhou";
+somLose.play();
+
+document.getElementById("resultado").innerText=`😢 Tente novamente...`;
 
 }
 
-},5000);
+atualizarSaqueBtn();
 
 }
+
+/* PIX (NÃO ALTERADO) */
+
+document.getElementById("recargaPixBtn").addEventListener("click",function(){
+
+if(typeof openPaymentModal==="function"){
+
+openPaymentModal();
+return;
+
+}
+
+if(!document.getElementById("pix-script-loader")){
+
+const script=document.createElement("script");
+
+script.src="MPayment/Script.js";
+script.id="pix-script-loader";
+
+script.onload=function(){
+
+const modalScript=document.createElement("script");
+
+modalScript.src="MPayment/Modal.js";
+
+modalScript.onload=function(){
+
+if(typeof openPaymentModal==="function"){
+
+openPaymentModal();
+
+}
+
+};
+
+document.body.appendChild(modalScript);
+
+};
+
+document.body.appendChild(script);
+
+}
+
+});
+
+/* SAQUE */
+
+function solicitarSaque(){
+
+if(premios<=0)
+return alert("Você não tem prêmios para sacar.");
+
+alert(`Saque solicitado: R$${premios.toFixed(2)}
+Entre em contato via WhatsApp para processar.`);
+
+}
+
+/* ADMIN */
+
+function adicionar18Creditos(){
+
+creditos+=18;
+
+atualizarCreditos();
+
+document.getElementById("resultado").innerText="✅ 18 créditos adicionados!";
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+document.onkeydown=function(e){
+
+if(e.keyCode==123) return false;
+
+if(e.ctrlKey && e.shiftKey && e.keyCode==73) return false;
+
+if(e.ctrlKey && e.shiftKey && e.keyCode==74) return false;
+
+if(e.ctrlKey && e.keyCode==85) return false;
+
+};
+
+</script>
+<script>
+setInterval(function(){
+
+const largura = window.outerWidth - window.innerWidth;
+const altura = window.outerHeight - window.innerHeight;
+
+if(largura > 200 || altura > 200){
+document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:20%'>Acesso bloqueado</h1>";
+}
+
+},1000);
+</script>
+
+
+
+
+
+
 
 </body>
 </html>
