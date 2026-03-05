@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Roleta de Prêmios</title>
+
+<link rel="stylesheet" href="MPayment/Styles.css">
+
+<style>
+
+body{
+margin:0;
+background:#111;
+font-family:sans-serif;
+text-align:center;
+color:white;
+}
+
+#app{
+max-width:420px;
+margin:auto;
+padding:10px;
+}
+
+h1{
+margin:10px 0;
+}
+
+#saldo{
+font-size:20px;
+margin-bottom:10px;
+color:#0f0;
+}
+
+.roleta{
+width:320px;
+height:320px;
+border-radius:50%;
+border:8px solid gold;
+margin:auto;
+position:relative;
+overflow:hidden;
+}
+
+.roleta canvas{
+width:100%;
+height:100%;
+}
+
+.pointer{
+width:0;
+height:0;
+border-left:15px solid transparent;
+border-right:15px solid transparent;
+border-bottom:30px solid red;
+margin:auto;
+}
+
+button{
+padding:12px 25px;
+font-size:18px;
+margin-top:15px;
+border:none;
+border-radius:8px;
+background:gold;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:active{
+transform:scale(0.95);
+}
+
+#resultado{
+margin-top:15px;
+font-size:22px;
+font-weight:bold;
+color:yellow;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<h1>🎰 Roleta Premiada</h1>
+
+<div id="saldo">Saldo: R$ <span id="valorSaldo">0</span></div>
+
+<div class="pointer"></div>
+
+<div class="roleta">
+<canvas id="wheel"></canvas>
+</div>
+
+<button onclick="girar()">GIRAR</button>
+
+<div id="resultado"></div>
+
+<br>
+
+<button onclick="openModal()">Recarga via Pix</button>
+
+</div>
+
+
+<audio id="spin" src="sons/spin.mp3"></audio>
+<audio id="win" src="sons/win.mp3"></audio>
+<audio id="lose" src="sons/lose.mp3"></audio>
+
+
+<script src="MPayment/Modal.js"></script>
+<script src="MPayment/Script.js"></script>
+
+<script>
+
+const canvas = document.getElementById("wheel")
+const ctx = canvas.getContext("2d")
+
+canvas.width = 320
+canvas.height = 320
+
+let saldo = localStorage.getItem("saldoRoleta") || 0
+saldo = parseFloat(saldo)
+
+document.getElementById("valorSaldo").innerText = saldo
+
+const premios = [
+0,0,0,10,20,30,50,80,100,150,200,300,500,1000
+]
+
+const cores = [
+"#222","#333","#444","#555","#666","#777",
+"#888","#999","#aaa","#bbb","#ccc","#ddd"
+]
+
+let angle = 0
+
+function desenhar(){
+
+let fatia = (Math.PI*2)/premios.length
+
+for(let i=0;i<premios.length;i++){
+
+ctx.beginPath()
+ctx.moveTo(160,160)
+
+ctx.arc(
+160,160,
+160,
+fatia*i,
+fatia*(i+1)
+)
+
+ctx.fillStyle = cores[i%cores.length]
+ctx.fill()
+
+ctx.save()
+
+ctx.translate(160,160)
+ctx.rotate(fatia*i + fatia/2)
+
+ctx.fillStyle="black"
+ctx.font="bold 14px sans-serif"
+ctx.fillText("R$"+premios[i],60,5)
+
+ctx.restore()
+
+}
+
+}
+
+desenhar()
+
+let girando=false
+
+function girar(){
+
+if(girando) return
+
+if(saldo <= 0){
+alert("Saldo insuficiente")
+return
+}
+
+saldo -= 1
+updateSaldo()
+
+document.getElementById("spin").play()
+
+girando=true
+
+let voltas = Math.random()*360 + 720
+
+let start = angle
+let end = angle + voltas
+
+let duracao = 4000
+let startTime=null
+
+function animar(time){
+
+if(!startTime) startTime=time
+
+let progress = time-startTime
+
+let pct = progress/duracao
+
+if(pct>1) pct=1
+
+angle = start + (end-start)*pct
+
+canvas.style.transform = "rotate("+angle+"deg)"
+
+if(pct<1){
+
+requestAnimationFrame(animar)
+
+}else{
+
+finalizar()
+
+}
+
+}
+
+requestAnimationFrame(animar)
+
+}
+
+function finalizar(){
+
+girando=false
+
+let graus = angle % 360
+
+let setor = Math.floor((360-graus)/(360/premios.length))
+
+let premio = premios[setor]
+
+saldo += premio
+
+updateSaldo()
+
+if(premio>0){
+document.getElementById("resultado").innerText="🎉 Você ganhou R$"+premio
+document.getElementById("win").play()
+}else{
+document.getElementById("resultado").innerText="😢 Não ganhou"
+document.getElementById("lose").play()
+}
+
+}
+
+function updateSaldo(){
+
+localStorage.setItem("saldoRoleta",saldo)
+document.getElementById("valorSaldo").innerText=saldo
+
+}
+
+</script>
+
+</body>
+</html>
