@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>🎰 Roleta Premiada</title>
+
+<style>
+
+body{
+margin:0;
+background:#0d0d0d;
+font-family:Arial;
+text-align:center;
+color:white;
+}
+
+#app{
+max-width:420px;
+margin:auto;
+padding:20px;
+}
+
+h1{
+color:#ffd700;
+text-shadow:0 0 10px #ffd700;
+}
+
+.roletaBox{
+position:relative;
+width:320px;
+height:320px;
+margin:20px auto;
+}
+
+#wheel{
+width:100%;
+height:100%;
+transition:transform 5s cubic-bezier(0.17,0.67,0.12,0.99);
+}
+
+.pointer{
+width:0;
+height:0;
+border-left:15px solid transparent;
+border-right:15px solid transparent;
+border-top:30px solid red;
+position:absolute;
+top:-15px;
+left:50%;
+transform:translateX(-50%);
+}
+
+button{
+padding:15px;
+font-size:20px;
+border:none;
+border-radius:10px;
+background:#ffd700;
+color:black;
+width:100%;
+cursor:pointer;
+}
+
+#resultado{
+margin-top:20px;
+font-size:25px;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="app">
+
+<h1>🎰 Roleta Premiada</h1>
+
+<div class="roletaBox">
+
+<div class="pointer"></div>
+
+<canvas id="wheel" width="320" height="320"></canvas>
+
+</div>
+
+<button onclick="girar()">GIRAR</button>
+
+<div id="resultado"></div>
+
+</div>
+
+<script>
+
+const API="https://script.google.com/macros/s/AKfycbwN_2mY4Ht9FCkr7iVL8AtU-Fl-gSn8bY1_9kPhMqui0xBs5s2N54SDdutgkTkCE40VTQ/exec";
+
+const canvas=document.getElementById("wheel");
+const ctx=canvas.getContext("2d");
+
+const premios=[
+0,0,0,0,0,0,0,0,
+5,5,5,5,
+10,10,10,
+20,20,
+50,
+100,
+200,
+500,
+1000
+];
+
+const cores=[
+"#333","#444","#555","#666",
+"#777","#888","#cc0000","#dd0000",
+"#00aa00","#00cc00","#0000aa","#0000cc",
+"#ffaa00","#ffd700","#ff8800","#ff5500"
+];
+
+const fatia=(Math.PI*2)/premios.length;
+
+function desenhar(){
+
+for(let i=0;i<premios.length;i++){
+
+ctx.beginPath();
+ctx.moveTo(160,160);
+
+ctx.arc(
+160,
+160,
+160,
+fatia*i,
+fatia*(i+1)
+);
+
+ctx.fillStyle=cores[i%cores.length];
+ctx.fill();
+
+ctx.strokeStyle="#111";
+ctx.stroke();
+
+ctx.save();
+
+ctx.translate(160,160);
+ctx.rotate(fatia*i+fatia/2);
+
+ctx.fillStyle="white";
+ctx.font="bold 14px Arial";
+ctx.textAlign="center";
+
+ctx.fillText("R$"+premios[i],90,5);
+
+ctx.restore();
+
+}
+
+}
+
+desenhar();
+
+let rotacaoAtual=0;
+
+async function girar(){
+
+document.getElementById("resultado").innerText="Girando...";
+
+let resposta=await fetch(API);
+
+let dados=await resposta.json();
+
+let premio=dados.premio;
+
+let voltas=Math.floor(Math.random()*6)+8;
+
+let anguloExtra=Math.random()*360;
+
+let rotacaoFinal=rotacaoAtual+(voltas*360)+anguloExtra;
+
+canvas.style.transform=`rotate(${rotacaoFinal}deg)`;
+
+rotacaoAtual=rotacaoFinal;
+
+setTimeout(()=>{
+
+if(premio>0){
+
+document.getElementById("resultado").innerText=
+"🎉 Você ganhou R$"+premio;
+
+}else{
+
+document.getElementById("resultado").innerText=
+"😢 Não ganhou";
+
+}
+
+},5000);
+
+}
+
+</script>
+
+</body>
+</html>
