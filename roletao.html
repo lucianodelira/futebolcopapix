@@ -260,15 +260,21 @@ atualizarSaqueBtn();
 
 /* ROLETA */
 
+const API="COLE_AQUI_URL_DO_GOOGLE_SCRIPT";
+
 const canvas=document.getElementById("wheel");
 const ctx=canvas.getContext("2d");
 
-const premiosLista=[
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-5,5,5,5,5,5,
+const premios=[
+0,0,0,0,0,0,0,0,
+5,5,5,5,
 10,10,10,
 20,20,
-50,100,200,500,1000
+50,
+100,
+200,
+500,
+1000
 ];
 
 premiosLista.sort(()=>Math.random()-0.5);
@@ -280,11 +286,11 @@ const cores=[
 "#ffaa00","#ffd700","#ff8800","#ff5500"
 ];
 
-const fatia=(Math.PI*2)/premiosLista.length;
+const fatia=(Math.PI*2)/premios.length;
 
-function desenharRoleta(){
+function desenhar(){
 
-for(let i=0;i<premiosLista.length;i++){
+for(let i=0;i<premios.length;i++){
 
 ctx.beginPath();
 ctx.moveTo(160,160);
@@ -301,7 +307,6 @@ ctx.fillStyle=cores[i%cores.length];
 ctx.fill();
 
 ctx.strokeStyle="#111";
-ctx.lineWidth=2;
 ctx.stroke();
 
 ctx.save();
@@ -310,10 +315,10 @@ ctx.translate(160,160);
 ctx.rotate(fatia*i+fatia/2);
 
 ctx.fillStyle="white";
-ctx.font="bold 16px Arial";
+ctx.font="bold 14px Arial";
 ctx.textAlign="center";
 
-ctx.fillText("R$"+premiosLista[i],85,6);
+ctx.fillText("R$"+premios[i],90,5);
 
 ctx.restore();
 
@@ -321,114 +326,47 @@ ctx.restore();
 
 }
 
-desenharRoleta();
+desenhar();
 
-let girando=false;
 let rotacaoAtual=0;
 
-/* EXPLOSÃO DE MOEDAS */
+async function girar(){
 
-function explosaoMoedas(){
+document.getElementById("resultado").innerText="Girando...";
 
-const container=document.getElementById("coinsExplosion");
+let resposta=await fetch(API);
 
-for(let i=0;i<25;i++){
+let dados=await resposta.json();
 
-const coin=document.createElement("div");
+let premio=dados.premio;
 
-coin.className="coin";
+let voltas=Math.floor(Math.random()*6)+8;
 
-coin.innerHTML="💰";
+let anguloExtra=Math.random()*360;
 
-coin.style.left=Math.random()*100+"%";
-
-coin.style.animationDelay=(Math.random()*0.3)+"s";
-
-container.appendChild(coin);
-
-setTimeout(()=>coin.remove(),1800);
-
-}
-
-}
-
-/* GIRAR */
-
-function girar(){
-
-if(girando)return;
-
-somClick.play();
-
-if(creditos<1){
-
-alert("Créditos insuficientes! Recarregue via Pix.");
-return;
-
-}
-
-creditos-=1;
-atualizarCreditos();
-
-girando=true;
-
-somSpin.play();
-
-document.getElementById("resultado").innerText="";
-
-const voltas=Math.floor(Math.random()*5)+10;
-
-const anguloExtra=Math.random()*360;
-
-const rotacaoFinal=rotacaoAtual+(voltas*360)+anguloExtra;
+let rotacaoFinal=rotacaoAtual+(voltas*360)+anguloExtra;
 
 canvas.style.transform=`rotate(${rotacaoFinal}deg)`;
 
 rotacaoAtual=rotacaoFinal;
 
-setTimeout(finalizarGiro,6200);
+setTimeout(()=>{
 
-}
+if(premio>0){
 
-/* RESULTADO */
-
-function finalizarGiro(){
-
-girando=false;
-
-let anguloFinal = rotacaoAtual % 360;
-if(anguloFinal<0) anguloFinal+=360;
-
-const anguloPorSetor = 360/premiosLista.length;
-
-let anguloSeta = (270 - anguloFinal + 360) % 360;
-
-let setorIndex = Math.floor(anguloSeta / anguloPorSetor);
-
-let premioGanho = premiosLista[setorIndex];
-
-premios += premioGanho;
-atualizarPremios();
-
-if(premioGanho>0){
-
-somWin.play();
-explosaoMoedas();
-
-document.getElementById("resultado").innerText=`🎉 GANHOU R$${premioGanho}!`;
+document.getElementById("resultado").innerText=
+"🎉 Você ganhou R$"+premio;
 
 }else{
 
-somLose.play();
-
-document.getElementById("resultado").innerText=`😢 Tente novamente...`;
-
-}
-
-atualizarSaqueBtn();
+document.getElementById("resultado").innerText=
+"😢 Não ganhou";
 
 }
 
+},5000);
+
+}
 /* PIX (NÃO ALTERADO) */
 
 document.getElementById("recargaPixBtn").addEventListener("click",function(){
