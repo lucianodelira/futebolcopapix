@@ -4,253 +4,388 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎰 Roleta Premiada</title>
+
 <style>
-body {
-  margin: 0;
-  background: #0d0d0d;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  color: white;
+
+body{
+margin:0;
+background:#0d0d0d;
+font-family:Arial;
+text-align:center;
+color:white;
 }
-#app {
-  max-width: 420px;
-  margin: auto;
-  padding: 15px;
+
+#app{
+max-width:420px;
+margin:auto;
+padding:15px;
 }
-h1 {
-  color: #ffd700;
-  margin: 10px 0;
+
+h1{
+color:#ffd700;
+margin:10px 0;
 }
-#saldoArea {
-  display: flex;
-  justify-content: space-around;
-  margin: 15px 0;
-  font-size: 20px;
+
+#saldoArea{
+display:flex;
+justify-content:space-around;
+margin:15px 0;
+font-size:20px;
 }
-.credito-box {
-  background: #222;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: 2px solid #444;
+
+.credito-box{
+background:#222;
+padding:10px 20px;
+border-radius:10px;
+border:2px solid #444;
 }
-.credito { color: #00ff9c; }
-.premio { color: #ffcc00; }
-.roletaBox {
-  position: relative;
-  width: 320px;
-  height: 320px;
-  margin: 20px auto;
+
+.credito{color:#00ff9c;font-weight:bold;}
+.premio{color:#ffcc00;font-weight:bold;}
+
+.roletaBox{
+position:relative;
+width:320px;
+height:320px;
+margin:20px auto;
 }
-#wheel {
-  width: 100%;
-  height: 100%;
-  transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+
+#wheel{
+width:100%;
+height:100%;
+transition:transform 5.8s cubic-bezier(0.17,0.67,0.12,0.99);
 }
-.pointer {
-  width: 0;
-  height: 0;
-  border-left: 22px solid transparent;
-  border-right: 22px solid transparent;
-  border-bottom: 45px solid #ff0000;
-  position: absolute;
-  top: -28px;
-  left: 50%;
-  transform: translateX(-50%);
-  filter: drop-shadow(0 0 8px #ff4444);
-  z-index: 10;
+
+/* SETA EMBAIXO */
+.pointer{
+width:0;
+height:0;
+border-left:15px solid transparent;
+border-right:15px solid transparent;
+border-top:32px solid #ff0000; /* ponta para baixo */
+position:absolute;
+top:-20px; /* coloca a seta acima da roleta */
+left:50%;
+transform:translateX(-50%);
+filter:drop-shadow(0 0 6px #ff4444);
+z-index:10;
 }
-button {
-  padding: 14px 28px;
-  font-size: 18px;
-  margin: 10px 5px;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  cursor: pointer;
+
+button{
+padding:14px 28px;
+font-size:18px;
+margin:10px 5px;
+border:none;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
 }
-#giraBtn { background: #ffd700; color: #000; }
-.recargaBtn { 
-  width: 100%; 
-  height: 45px; 
-  background: #00aa00; 
-  color: white; 
-  font-size: 18px; 
-  border: none; 
-  border-radius: 8px; 
-  margin: 15px 0;
+
+#giraBtn{
+background:#ffd700;
+color:#000;
+width:100%;
 }
-.recargaBtn:hover { background: #008800; }
-#sacarBtn { 
-  background: #ff6600; 
-  color: white; 
-  display: none; 
+
+.recargaBtn{
+width:100%;
+height:50px;
+background:#00aa00;
+color:white;
+font-size:20px;
+border-radius:10px;
+margin:15px 0;
 }
-#resultado {
-  margin: 20px 0;
-  font-size: 24px;
-  min-height: 40px;
+
+#sacarBtn{
+background:#ff6600;
+color:white;
+display:none;
+width:100%;
+height:50px;
+font-size:18px;
 }
+
+#resultado{
+margin:20px 0;
+font-size:26px;
+min-height:40px;
+font-weight:bold;
+}
+
+
+#wheel{
+transform-origin:center;
+}
+
 </style>
-<!-- Inclua o CSS do pagamento se não estiver sendo carregado pelos JS -->
+
 <link rel="stylesheet" href="MPayment/Styles.css">
+
 </head>
+
 <body>
+
 <div id="app">
-  <h1>🎰 Roleta Premiada</h1>
 
-  <div id="saldoArea">
-    <div class="credito-box">
-      Créditos: R$ <span id="valorCreditos" class="credito">10.00</span>
-    </div>
-    <div class="credito-box">
-      Prêmios: R$ <span id="valorPremios" class="premio">0.00</span>
-    </div>
-  </div>
+<h1>🎰 Roleta Premiada</h1>
 
-  <div class="roletaBox">
-    <div class="pointer"></div>
-    <canvas id="wheel" width="320" height="320"></canvas>
-  </div>
+<div id="saldoArea">
 
-  <button id="giraBtn" onclick="girar()">🎰 GIRAR (custa R$1)</button>
-  <div id="resultado"></div>
+<div class="credito-box">
+Créditos: R$ <span id="valorCreditos" class="credito">0.00</span>
+</div>
 
-  <button class="recargaBtn" id="recargaPixBtn">Recarga via Pix</button>
-  <button id="sacarBtn" onclick="solicitarSaque()">Sacar Prêmios</button>
+<div class="credito-box">
+Prêmios: R$ <span id="valorPremios" class="premio">0.00</span>
+</div>
+
+</div>
+
+<div class="roletaBox">
+<div class="pointer"></div>
+<canvas id="wheel" width="320" height="320"></canvas>
+</div>
+
+<button id="giraBtn" onclick="girar()">GIRAR (custa R$1)</button>
+
+<div id="resultado"></div>
+
+<button class="recargaBtn" id="recargaPixBtn">Recarga via Pix</button>
+
+<button id="sacarBtn" onclick="solicitarSaque()">Sacar Prêmios</button>
+
+<button onclick="adicionar18Creditos()" style="background:#0099ff;color:white;width:100%;height:45px;">
+Adicionar 18 Créditos
+</button>
+
 </div>
 
 <script>
-// ────────────────────────────────────────────────
-// Lógica da Roleta (mantida igual à versão anterior)
-// ────────────────────────────────────────────────
-let creditos = parseFloat(localStorage.getItem("creditosRoleta")) || 10;
+
+/* SALDO */
+
+let creditos = parseInt(localStorage.getItem('credits')) || 0;
 let premios = parseFloat(localStorage.getItem("premiosRoleta")) || 0;
 
 document.getElementById("valorCreditos").innerText = creditos.toFixed(2);
 document.getElementById("valorPremios").innerText = premios.toFixed(2);
 
-function atualizarSaqueBtn() {
-  document.getElementById("sacarBtn").style.display = premios > 0 ? "inline-block" : "none";
+function atualizarCreditos(){
+localStorage.setItem('credits',creditos);
+document.getElementById("valorCreditos").innerText=creditos.toFixed(2);
 }
+
+function atualizarPremios(){
+localStorage.setItem("premiosRoleta",premios);
+document.getElementById("valorPremios").innerText=premios.toFixed(2);
+}
+
+function atualizarSaqueBtn(){
+document.getElementById("sacarBtn").style.display=premios>0?"block":"none";
+}
+
 atualizarSaqueBtn();
 
-const canvas = document.getElementById("wheel");
-const ctx = canvas.getContext("2d");
+/* ROLETA */
 
-const premiosLista = [0,0,0,0,0,0,0,0,5,10,20,50,100,200,500,1000];
-premiosLista.sort(() => Math.random() - 0.5);
+const canvas=document.getElementById("wheel");
+const ctx=canvas.getContext("2d");
 
-const cores = ["#333","#444","#555","#666","#777","#888","#cc0000","#dd0000","#00aa00","#00cc00","#0000aa","#0000cc","#ffaa00","#ffd700","#ff8800","#ff5500"];
+const premiosLista=[0,0,0,0,0,0,0,0,5,10,20,50,100,200,500,1000];
+premiosLista.sort(()=>Math.random()-0.5);
 
-const fatia = (Math.PI * 2) / premiosLista.length;
+const cores=[
+"#333","#444","#555","#666",
+"#777","#888","#cc0000","#dd0000",
+"#00aa00","#00cc00","#0000aa","#0000cc",
+"#ffaa00","#ffd700","#ff8800","#ff5500"
+];
 
-function desenharRoleta() {
-  for (let i = 0; i < premiosLista.length; i++) {
-    ctx.beginPath();
-    ctx.moveTo(160, 160);
-    ctx.arc(160, 160, 160, fatia * i, fatia * (i + 1));
-    ctx.fillStyle = cores[i % cores.length];
-    ctx.fill();
-    ctx.strokeStyle = "#111"; ctx.lineWidth = 2; ctx.stroke();
+const fatia=(Math.PI*2)/premiosLista.length;
 
-    ctx.save();
-    ctx.translate(160, 160);
-    ctx.rotate(fatia * i + fatia / 2);
-    ctx.fillStyle = "white";
-    ctx.font = "bold 16px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("R$" + premiosLista[i], 85, 6);
-    ctx.restore();
-  }
+function desenharRoleta(){
+
+for(let i=0;i<premiosLista.length;i++){
+
+ctx.beginPath();
+ctx.moveTo(160,160);
+
+ctx.arc(
+160,
+160,
+160,
+fatia*i,
+fatia*(i+1)
+);
+
+ctx.fillStyle=cores[i%cores.length];
+ctx.fill();
+
+ctx.strokeStyle="#111";
+ctx.lineWidth=2;
+ctx.stroke();
+
+ctx.save();
+
+ctx.translate(160,160);
+ctx.rotate(fatia*i+fatia/2);
+
+ctx.fillStyle="white";
+ctx.font="bold 16px Arial";
+ctx.textAlign="center";
+
+ctx.fillText("R$"+premiosLista[i],85,6);
+
+ctx.restore();
+
 }
+
+}
+
 desenharRoleta();
 
-let girando = false;
-let rotacaoAtual = 0;
+let girando=false;
+let rotacaoAtual=0;
 
-function girar() {
-  if (girando) return;
-  if (creditos < 1) { alert("Créditos insuficientes! Recarregue via Pix."); return; }
+/* GIRAR */
 
-  creditos -= 1;
-  atualizarCreditos();
-  girando = true;
-  document.getElementById("resultado").innerText = "";
+function girar(){
 
-  const voltas = Math.floor(Math.random() * 6) + 8;
-  const anguloExtra = Math.random() * 360;
-  const rotacaoFinal = rotacaoAtual + (voltas * 360) + anguloExtra;
-  canvas.style.transform = `rotate(${rotacaoFinal}deg)`;
-  rotacaoAtual = rotacaoFinal;
+if(girando)return;
 
-  setTimeout(finalizarGiro, 5500);
+if(creditos<1){
+
+alert("Créditos insuficientes! Recarregue via Pix.");
+
+return;
+
 }
 
-function finalizarGiro() {
-  girando = false;
-  let angulo = (360 - (rotacaoAtual % 360)) % 360;
-  let setorIndex = Math.floor(angulo / (360 / premiosLista.length));
-  let premioGanho = premiosLista[setorIndex];
+creditos-=1;
 
-  premios += premioGanho;
-  atualizarPremios();
+atualizarCreditos();
 
-  document.getElementById("resultado").innerText = premioGanho > 0 
-    ? `🎉 GANHOU R$${premioGanho}!` 
-    : `😢 Tente novamente...`;
+girando=true;
 
-  atualizarSaqueBtn();
+document.getElementById("resultado").innerText="";
+
+const voltas=Math.floor(Math.random()*5)+10;
+
+const anguloExtra=Math.random()*360;
+
+const rotacaoFinal=rotacaoAtual+(voltas*360)+anguloExtra;
+
+canvas.style.transform=`rotate(${rotacaoFinal}deg)`;
+
+rotacaoAtual=rotacaoFinal;
+
+setTimeout(finalizarGiro,6200);
+
 }
 
-function atualizarCreditos() {
-  localStorage.setItem("creditosRoleta", creditos);
-  document.getElementById("valorCreditos").innerText = creditos.toFixed(2);
-}
-function atualizarPremios() {
-  localStorage.setItem("premiosRoleta", premios);
-  document.getElementById("valorPremios").innerText = premios.toFixed(2);
+/* RESULTADO */
+
+function finalizarGiro(){
+
+girando=false;
+
+let anguloFinal = rotacaoAtual % 360;
+if(anguloFinal<0) anguloFinal+=360;
+
+const anguloPorSetor = 360/premiosLista.length;
+
+/* posição da seta (topo = 270 graus) */
+let anguloSeta = (270 - anguloFinal + 360) % 360;
+
+let setorIndex = Math.floor(anguloSeta / anguloPorSetor);
+
+let premioGanho = premiosLista[setorIndex];
+
+premios += premioGanho;
+atualizarPremios();
+
+document.getElementById("resultado").innerText =
+premioGanho>0
+? `🎉 GANHOU R$${premioGanho}!`
+: `😢 Tente novamente...`;
+
+atualizarSaqueBtn();
+
 }
 
-function solicitarSaque() {
-  if (premios <= 0) return alert("Sem prêmios para sacar.");
-  alert(`Saque de R$${premios.toFixed(2)} solicitado!\nEntre em contato via WhatsApp ou envie comprovante.`);
+/* PIX */
+
+document.getElementById("recargaPixBtn").addEventListener("click",function(){
+
+if(typeof openPaymentModal==="function"){
+
+openPaymentModal();
+
+return;
+
 }
 
-// ────────────────────────────────────────────────
-// Integração com MPayment (igual ao caça-níquel)
-// ────────────────────────────────────────────────
-document.getElementById("recargaPixBtn").addEventListener("click", function () {
-  if (typeof openPaymentModal === "function") {
-    // Já carregado → chama direto
-    openPaymentModal();
-    return;
-  }
+if(!document.getElementById("pix-script-loader")){
 
-  // Ainda não carregado → carrega Script.js primeiro
-  if (!document.getElementById("pix-script-loader")) {
-    const script = document.createElement("script");
-    script.src = "MPayment/Script.js";
-    script.id = "pix-script-loader";
-    script.onload = function () {
-      // Após carregar Script.js, carrega Modal.js (se necessário)
-      if (!document.getElementById("pix-modal-loader")) {
-        const modalScript = document.createElement("script");
-        modalScript.src = "MPayment/Modal.js";
-        modalScript.id = "pix-modal-loader";
-        modalScript.onload = function () {
-          if (typeof openPaymentModal === "function") {
-            openPaymentModal();  // Abre o modal de Pix
-          } else {
-            alert("Erro: função openPaymentModal não encontrada.");
-          }
-        };
-        document.body.appendChild(modalScript);
-      }
-    };
-    script.onerror = () => alert("Erro ao carregar MPayment/Script.js – verifique o caminho ou permissão.");
-    document.body.appendChild(script);
-  }
+const script=document.createElement("script");
+
+script.src="MPayment/Script.js";
+
+script.id="pix-script-loader";
+
+script.onload=function(){
+
+const modalScript=document.createElement("script");
+
+modalScript.src="MPayment/Modal.js";
+
+modalScript.onload=function(){
+
+if(typeof openPaymentModal==="function"){
+
+openPaymentModal();
+
+}
+
+};
+
+document.body.appendChild(modalScript);
+
+};
+
+document.body.appendChild(script);
+
+}
+
 });
+
+/* SAQUE */
+
+function solicitarSaque(){
+
+if(premios<=0)
+
+return alert("Você não tem prêmios para sacar.");
+
+alert(`Saque solicitado: R$${premios.toFixed(2)}
+Entre em contato via WhatsApp para processar.`);
+
+}
+
+/* ADMIN */
+
+function adicionar18Creditos(){
+
+creditos+=18;
+
+atualizarCreditos();
+
+document.getElementById("resultado").innerText="✅ 18 créditos adicionados!";
+
+}
+
 </script>
+
 </body>
 </html>
