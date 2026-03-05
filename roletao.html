@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎰 Roleta Premiada</title>
-
 <style>
-
 body{
 margin:0;
 background:#0d0d0d;
@@ -15,45 +13,37 @@ text-align:center;
 color:white;
 overflow-x:hidden;
 }
-
 #app{
 max-width:420px;
 margin:auto;
 padding:15px;
 }
-
 h1{
 color:#ffd700;
 margin:10px 0;
 text-shadow:0 0 10px #ffd700;
 }
-
 #saldoArea{
 display:flex;
 justify-content:space-around;
 margin:15px 0;
 font-size:20px;
 }
-
 .credito-box{
 background:#222;
 padding:10px 20px;
 border-radius:10px;
 border:2px solid #444;
 }
-
 .credito{color:#00ff9c;font-weight:bold;}
 .premio{color:#ffcc00;font-weight:bold;}
-
 .roletaBox{
 position:relative;
 width:320px;
 height:320px;
 margin:20px auto;
 }
-
 /* BRILHO GIRANDO */
-
 .roletaBox::before{
 content:"";
 position:absolute;
@@ -70,12 +60,10 @@ top:-20px;
 left:-20px;
 z-index:0;
 }
-
 @keyframes brilho{
 0%{transform:rotate(0deg);}
 100%{transform:rotate(360deg);}
 }
-
 #wheel{
 width:100%;
 height:100%;
@@ -84,7 +72,6 @@ transform-origin:center;
 position:relative;
 z-index:1;
 }
-
 .pointer{
 width:0;
 height:0;
@@ -97,7 +84,6 @@ left:50%;
 transform:translateX(-50%);
 z-index:10;
 }
-
 button{
 padding:14px 28px;
 font-size:18px;
@@ -107,13 +93,11 @@ border-radius:10px;
 font-weight:bold;
 cursor:pointer;
 }
-
 #giraBtn{
 background:#ffd700;
 color:#000;
 width:100%;
 }
-
 .recargaBtn{
 width:100%;
 height:50px;
@@ -123,7 +107,6 @@ font-size:20px;
 border-radius:10px;
 margin:15px 0;
 }
-
 #sacarBtn{
 background:#ff6600;
 color:white;
@@ -132,16 +115,13 @@ width:100%;
 height:50px;
 font-size:18px;
 }
-
 #resultado{
 margin:20px 0;
 font-size:26px;
 min-height:40px;
 font-weight:bold;
 }
-
 /* EXPLOSÃO DE MOEDAS */
-
 #coinsExplosion{
 position:fixed;
 top:0;
@@ -151,481 +131,333 @@ height:100%;
 pointer-events:none;
 z-index:999;
 }
-
 .coin{
 position:absolute;
 font-size:30px;
 animation:coinFall 1.8s ease-out forwards;
 }
-
 @keyframes coinFall{
-
 0%{
 transform:translateY(-100px) scale(0.5) rotate(0deg);
 opacity:1;
 }
-
 100%{
 transform:translateY(500px) scale(1.2) rotate(720deg);
 opacity:0;
 }
-
 }
-
 </style>
-
 <link rel="stylesheet" href="MPayment/Styles.css">
-
 </head>
-
 <body>
-
 <div id="app">
-
 <h1>🎰 Roleta Premiada</h1>
-
 <div id="saldoArea">
-
 <div class="credito-box">
 Créditos: R$ <span id="valorCreditos" class="credito">0.00</span>
 </div>
-
 <div class="credito-box">
 Prêmios: R$ <span id="valorPremios" class="premio">0.00</span>
 </div>
-
 </div>
-
 <div class="roletaBox">
 <div class="pointer"></div>
 <canvas id="wheel" width="320" height="320"></canvas>
 </div>
-
-<button id="giraBtn" onclick="girar()">GIRAR (custa R$1)</button>
-
+<button id="giraBtn">GIRAR (custa R$1)</button>
 <div id="resultado"></div>
-
 <button class="recargaBtn" id="recargaPixBtn">Recarga via Pix</button>
-
 <button id="sacarBtn" onclick="solicitarSaque()">Sacar Prêmios</button>
-
 <button onclick="adicionar18Creditos()" style="background:#0099ff;color:white;width:100%;height:45px;">
-Adicionar 18 Créditos
+Adicionar 18 Créditos (admin)
 </button>
-
 </div>
-
 <div id="coinsExplosion"></div>
 
 <script>
+// ────────────────────────────────────────────────
+// CONFIGURAÇÃO PRINCIPAL
+// ────────────────────────────────────────────────
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwN_2mY4Ht9FCkr7iVL8AtU-Fl-gSn8bY1_9kPhMqui0xBs5s2N54SDdutgkTkCE40VTQ/exec";  
+// ↑↑↑ SUBSTITUA PELO LINK REAL DO SEU GOOGLE APPS SCRIPT WEB APP
 
-/* SONS */
-
+// Sons
 const somClick = new Audio("sons/click.mp3");
-const somSpin = new Audio("sons/spi.mp3");
-const somWin = new Audio("sons/win.mp3");
-const somLose = new Audio("sons/lose.mp3");
-const somBg = new Audio("sons/background.mp3");
+const somSpin  = new Audio("sons/spi.mp3");
+const somWin   = new Audio("sons/win.mp3");
+const somLose  = new Audio("sons/lose.mp3");
+const somBg    = new Audio("sons/background.mp3");
+somBg.loop = true;
+somBg.volume = 0.3;
 
-somBg.loop=true;
-somBg.volume=0.3;
+document.body.addEventListener("click", () => {
+    somBg.play().catch(() => {});
+}, {once: true});
 
-document.body.addEventListener("click",()=>{
-somBg.play().catch(()=>{});
-},{once:true});
+// Identificador único do usuário
+let userId = localStorage.getItem("userId");
+if (!userId) {
+    userId = "uid_" + Date.now() + "_" + Math.random().toString(36).substr(2,9);
+    localStorage.setItem("userId", userId);
+}
 
-/* SALDO */
-
+// Variáveis de saldo
 let creditos = parseInt(localStorage.getItem('credits')) || 0;
-let premios = parseFloat(localStorage.getItem("premiosRoleta")) || 0;
+let premios  = parseFloat(localStorage.getItem("premiosRoleta")) || 0;
 
 document.getElementById("valorCreditos").innerText = creditos.toFixed(2);
-document.getElementById("valorPremios").innerText = premios.toFixed(2);
+document.getElementById("valorPremios").innerText  = premios.toFixed(2);
 
-function atualizarCreditos(){
-localStorage.setItem('credits',creditos);
-document.getElementById("valorCreditos").innerText=creditos.toFixed(2);
+function atualizarCreditos() {
+    localStorage.setItem('credits', creditos);
+    document.getElementById("valorCreditos").innerText = creditos.toFixed(2);
 }
 
-function atualizarPremios(){
-localStorage.setItem("premiosRoleta",premios);
-document.getElementById("valorPremios").innerText=premios.toFixed(2);
+function atualizarPremios() {
+    localStorage.setItem("premiosRoleta", premios);
+    document.getElementById("valorPremios").innerText = premios.toFixed(2);
 }
 
-function atualizarSaqueBtn(){
-document.getElementById("sacarBtn").style.display=premios>0?"block":"none";
+function atualizarSaqueBtn() {
+    document.getElementById("sacarBtn").style.display = premios > 0 ? "block" : "none";
 }
-
 atualizarSaqueBtn();
 
-/* ROLETA */
+// ────────────────────────────────────────────────
+// COMUNICAÇÃO COM GOOGLE APPS SCRIPT (CASHBACK)
+// ────────────────────────────────────────────────
+let cashbackPendente = 0;
 
-const canvas=document.getElementById("wheel");
-const ctx=canvas.getContext("2d");
-
-const premiosLista=[
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-5,5,5,5,5,5,
-10,10,10,
-20,20,
-50,100,200,500,1000
-];
-
-premiosLista.sort(()=>Math.random()-0.5);
-
-const cores=[
-"#333","#444","#555","#666",
-"#777","#888","#cc0000","#dd0000",
-"#00aa00","#00cc00","#0000aa","#0000cc",
-"#ffaa00","#ffd700","#ff8800","#ff5500"
-];
-
-const fatia=(Math.PI*2)/premiosLista.length;
-
-function desenharRoleta(){
-
-for(let i=0;i<premiosLista.length;i++){
-
-ctx.beginPath();
-ctx.moveTo(160,160);
-
-ctx.arc(
-160,
-160,
-160,
-fatia*i,
-fatia*(i+1)
-);
-
-ctx.fillStyle=cores[i%cores.length];
-ctx.fill();
-
-ctx.strokeStyle="#111";
-ctx.lineWidth=2;
-ctx.stroke();
-
-ctx.save();
-
-ctx.translate(160,160);
-ctx.rotate(fatia*i+fatia/2);
-
-ctx.fillStyle="white";
-ctx.font="bold 16px Arial";
-ctx.textAlign="center";
-
-ctx.fillText("R$"+premiosLista[i],85,6);
-
-ctx.restore();
-
+async function sendToGas(action, amount = 0) {
+    try {
+        const response = await fetch(GAS_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: action,
+                userId: userId,
+                amount: Number(amount)
+            })
+        });
+        return await response.json();
+    } catch (err) {
+        console.error("Erro ao falar com GAS:", err);
+        return { success: false };
+    }
 }
 
-}
+// ────────────────────────────────────────────────
+// ROLETA
+// ────────────────────────────────────────────────
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
 
+const premiosLista = [
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    5,5,5,5,5,5,
+    10,10,10,
+    20,20,
+    50,100,200,500,1000
+];
+// Embaralha uma vez só ao carregar
+premiosLista.sort(() => Math.random() - 0.5);
+
+const cores = [
+    "#333","#444","#555","#666","#777","#888",
+    "#cc0000","#dd0000","#00aa00","#00cc00",
+    "#0000aa","#0000cc","#ffaa00","#ffd700",
+    "#ff8800","#ff5500"
+];
+
+const fatia = (Math.PI * 2) / premiosLista.length;
+
+function desenharRoleta() {
+    for (let i = 0; i < premiosLista.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(160, 160);
+        ctx.arc(160, 160, 160, fatia * i, fatia * (i + 1));
+        ctx.fillStyle = cores[i % cores.length];
+        ctx.fill();
+        ctx.strokeStyle = "#111";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(160, 160);
+        ctx.rotate(fatia * i + fatia / 2);
+        ctx.fillStyle = "white";
+        ctx.font = "bold 16px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("R$" + premiosLista[i], 85, 6);
+        ctx.restore();
+    }
+}
 desenharRoleta();
 
-let girando=false;
-let rotacaoAtual=0;
+let girando = false;
+let rotacaoAtual = 0;
 
-/* EXPLOSÃO DE MOEDAS */
-
-function explosaoMoedas(){
-
-const container=document.getElementById("coinsExplosion");
-
-for(let i=0;i<25;i++){
-
-const coin=document.createElement("div");
-
-coin.className="coin";
-
-coin.innerHTML="💰";
-
-coin.style.left=Math.random()*100+"%";
-
-coin.style.animationDelay=(Math.random()*0.3)+"s";
-
-container.appendChild(coin);
-
-setTimeout(()=>coin.remove(),1800);
-
+// Explosão de moedas
+function explosaoMoedas() {
+    const container = document.getElementById("coinsExplosion");
+    for (let i = 0; i < 25; i++) {
+        const coin = document.createElement("div");
+        coin.className = "coin";
+        coin.innerHTML = "💰";
+        coin.style.left = Math.random() * 100 + "%";
+        coin.style.animationDelay = (Math.random() * 0.3) + "s";
+        container.appendChild(coin);
+        setTimeout(() => coin.remove(), 1800);
+    }
 }
 
-}
+// ────────────────────────────────────────────────
+// LÓGICA DE GIRO + CASHBACK 20%
+// ────────────────────────────────────────────────
+document.getElementById("giraBtn").onclick = async function girar() {
+    if (girando) return;
+    if (creditos < 1) {
+        alert("Créditos insuficientes! Recarregue via Pix.");
+        return;
+    }
 
-/* GIRAR */
+    // Verifica se tem cashback disponível
+    const info = await sendToGas("getCashbackInfo");
+    if (info.success && info.cashbackDisponivel > 0.1) {
+        cashbackPendente = Number(info.cashbackDisponivel);
+    } else {
+        cashbackPendente = 0;
+    }
 
-function girar(){
+    creditos -= 1;
+    atualizarCreditos();
 
-if(girando)return;
+    girando = true;
+    somSpin.play();
+    document.getElementById("resultado").innerText = "";
 
-somClick.play();
+    const voltas = Math.floor(Math.random() * 5) + 10;
+    const anguloExtra = Math.random() * 360;
+    const rotacaoFinal = rotacaoAtual + (voltas * 360) + anguloExtra;
 
-if(creditos<1){
+    canvas.style.transform = `rotate(${rotacaoFinal}deg)`;
+    rotacaoAtual = rotacaoFinal;
 
-alert("Créditos insuficientes! Recarregue via Pix.");
-return;
-
-}
-
-creditos-=1;
-atualizarCreditos();
-
-girando=true;
-
-somSpin.play();
-
-document.getElementById("resultado").innerText="";
-
-const voltas=Math.floor(Math.random()*5)+10;
-
-const anguloExtra=Math.random()*360;
-
-const rotacaoFinal=rotacaoAtual+(voltas*360)+anguloExtra;
-
-canvas.style.transform=`rotate(${rotacaoFinal}deg)`;
-
-rotacaoAtual=rotacaoFinal;
-
-setTimeout(finalizarGiro,6200);
-
-}
-
-/* RESULTADO */
-
-function finalizarGiro(){
-
-girando=false;
-
-let anguloFinal = rotacaoAtual % 360;
-if(anguloFinal<0) anguloFinal+=360;
-
-const anguloPorSetor = 360/premiosLista.length;
-
-let anguloSeta = (270 - anguloFinal + 360) % 360;
-
-let setorIndex = Math.floor(anguloSeta / anguloPorSetor);
-
-let premioGanho = premiosLista[setorIndex];
-
-premios += premioGanho;
-atualizarPremios();
-
-if(premioGanho>0){
-
-somWin.play();
-explosaoMoedas();
-
-document.getElementById("resultado").innerText=`🎉 GANHOU R$${premioGanho}!`;
-
-}else{
-
-somLose.play();
-
-document.getElementById("resultado").innerText=`😢 Tente novamente...`;
-
-}
-
-atualizarSaqueBtn();
-
-}
-
-/* PIX (NÃO ALTERADO) */
-
-document.getElementById("recargaPixBtn").addEventListener("click",function(){
-
-if(typeof openPaymentModal==="function"){
-
-openPaymentModal();
-return;
-
-}
-
-if(!document.getElementById("pix-script-loader")){
-
-const script=document.createElement("script");
-
-script.src="MPayment/Script.js";
-script.id="pix-script-loader";
-
-script.onload=function(){
-
-const modalScript=document.createElement("script");
-
-modalScript.src="MPayment/Modal.js";
-
-modalScript.onload=function(){
-
-if(typeof openPaymentModal==="function"){
-
-openPaymentModal();
-
-}
-
+    setTimeout(finalizarGiro, 6200);
 };
 
-document.body.appendChild(modalScript);
+async function finalizarGiro() {
+    girando = false;
 
-};
+    let anguloFinal = rotacaoAtual % 360;
+    if (anguloFinal < 0) anguloFinal += 360;
 
-document.body.appendChild(script);
+    const anguloPorSetor = 360 / premiosLista.length;
+    let anguloSeta = (270 - anguloFinal + 360) % 360;
+    let setorIndex = Math.floor(anguloSeta / anguloPorSetor);
 
+    let premioRoleta = premiosLista[setorIndex];
+    let premioFinal = premioRoleta;
+    let usouCashback = false;
+
+    // Lógica do cashback (garante parte do prejuízo de volta)
+    if (cashbackPendente > 0.1) {
+        const premiosDisponiveis = [5,10,20,50,100,200,500,1000];
+        let alvo = Math.min(cashbackPendente, 100); // limite prático por giro
+
+        if (premioRoleta < alvo) {
+            // Escolhe o menor prêmio disponível que seja >= alvo
+            let escolhido = premiosDisponiveis.find(v => v >= alvo);
+            if (!escolhido) escolhido = Math.max(...premiosDisponiveis);
+
+            premioFinal = escolhido;
+            usouCashback = true;
+
+            // Informa ao GAS quanto de cashback foi usado
+            const extra = premioFinal - premioRoleta;
+            await sendToGas("reportCashbackUsed", extra);
+            cashbackPendente = Math.max(0, cashbackPendente - extra);
+        }
+    }
+
+    premios += premioFinal;
+    atualizarPremios();
+
+    // Registra o giro real (valor que realmente saiu na roleta)
+    await sendToGas("reportSpin", premioRoleta);
+
+    if (premioFinal > 0) {
+        somWin.play();
+        explosaoMoedas();
+        document.getElementById("resultado").innerText = `🎉 GANHOU R$${premioFinal.toFixed(2)}!`;
+    } else {
+        somLose.play();
+        document.getElementById("resultado").innerText = `😢 Tente novamente...`;
+    }
+
+    atualizarSaqueBtn();
 }
 
+// ────────────────────────────────────────────────
+// PIX e SAQUE (mantidos originais)
+// ────────────────────────────────────────────────
+document.getElementById("recargaPixBtn").addEventListener("click", function(){
+    if (typeof openPaymentModal === "function") {
+        openPaymentModal();
+        return;
+    }
+    if (!document.getElementById("pix-script-loader")) {
+        const script = document.createElement("script");
+        script.src = "MPayment/Script.js";
+        script.id = "pix-script-loader";
+        script.onload = function(){
+            const modalScript = document.createElement("script");
+            modalScript.src = "MPayment/Modal.js";
+            modalScript.onload = function(){
+                if (typeof openPaymentModal === "function") {
+                    openPaymentModal();
+                }
+            };
+            document.body.appendChild(modalScript);
+        };
+        document.body.appendChild(script);
+    }
 });
 
-/* SAQUE */
-
-function solicitarSaque(){
-
-if(premios<=0)
-return alert("Você não tem prêmios para sacar.");
-
-alert(`Saque solicitado: R$${premios.toFixed(2)}
-Entre em contato via WhatsApp para processar.`);
-
+function solicitarSaque() {
+    if (premios <= 0) return alert("Você não tem prêmios para sacar.");
+    alert(`Saque solicitado: R$${premios.toFixed(2)}\nEntre em contato via WhatsApp para processar.`);
 }
 
-/* ADMIN */
-
-function adicionar18Creditos(){
-
-creditos+=18;
-
-atualizarCreditos();
-
-document.getElementById("resultado").innerText="✅ 18 créditos adicionados!";
-
+// ────────────────────────────────────────────────
+// ADMIN (apenas para testes)
+// ────────────────────────────────────────────────
+function adicionar18Creditos() {
+    creditos += 18;
+    atualizarCreditos();
+    document.getElementById("resultado").innerText = "✅ 18 créditos adicionados!";
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<!-- Bloqueios originais mantidos -->
 <script>
-
 document.addEventListener("contextmenu", e => e.preventDefault());
-
-document.onkeydown=function(e){
-
-if(e.keyCode==123) return false;
-
-if(e.ctrlKey && e.shiftKey && e.keyCode==73) return false;
-
-if(e.ctrlKey && e.shiftKey && e.keyCode==74) return false;
-
-if(e.ctrlKey && e.keyCode==85) return false;
-
+document.onkeydown = function(e){
+    if(e.keyCode==123) return false;
+    if(e.ctrlKey && e.shiftKey && e.keyCode==73) return false;
+    if(e.ctrlKey && e.shiftKey && e.keyCode==74) return false;
+    if(e.ctrlKey && e.keyCode==85) return false;
 };
-
 </script>
+
 <script>
 setInterval(function(){
-
-const largura = window.outerWidth - window.innerWidth;
-const altura = window.outerHeight - window.innerHeight;
-
-if(largura > 200 || altura > 200){
-document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:20%'>Acesso bloqueado</h1>";
-}
-
+    const largura = window.outerWidth - window.innerWidth;
+    const altura = window.outerHeight - window.innerHeight;
+    if (largura > 200 || altura > 200){
+        document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:20%'>Acesso bloqueado</h1>";
+    }
 },1000);
 </script>
-
-
-
-
-
-
-
 </body>
 </html>
