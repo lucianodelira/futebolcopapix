@@ -2,268 +2,264 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>Roleta de Prêmios</title>
-
-<link rel="stylesheet" href="MPayment/Styles.css">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎰 Roleta Premiada</title>
 <style>
-
 body{
 margin:0;
-background:#111;
-font-family:sans-serif;
+background:#0d0d0d;
+font-family:Arial;
 text-align:center;
 color:white;
 }
-
 #app{
 max-width:420px;
 margin:auto;
-padding:10px;
+padding:15px;
 }
-
 h1{
-margin:10px 0;
+color:#ffd700;
 }
-
 #saldo{
-font-size:20px;
-margin-bottom:10px;
-color:#0f0;
+font-size:22px;
+margin:10px 0;
+color:#00ff9c;
 }
-
-.roleta{
+.roletaBox{
+position:relative;
 width:320px;
 height:320px;
-border-radius:50%;
-border:8px solid gold;
 margin:auto;
-position:relative;
-overflow:hidden;
 }
-
-.roleta canvas{
+#wheel{
 width:100%;
-height:100%;
+transition:transform 5s cubic-bezier(.17,.67,.12,.99);
 }
-
 .pointer{
 width:0;
 height:0;
-border-left:15px solid transparent;
-border-right:15px solid transparent;
-border-bottom:30px solid red;
-margin:auto;
+border-left:18px solid transparent;
+border-right:18px solid transparent;
+border-bottom:35px solid red;
+position:absolute;
+top:-10px;
+left:50%;
+transform:translateX(-50%);
 }
-
 button{
-padding:12px 25px;
+padding:14px 28px;
 font-size:18px;
 margin-top:15px;
 border:none;
-border-radius:8px;
+border-radius:10px;
 background:gold;
 font-weight:bold;
 cursor:pointer;
 }
-
-button:active{
-transform:scale(0.95);
+.pixBtn{
+background:#00c853;
+color:white;
 }
-
 #resultado{
 margin-top:15px;
 font-size:22px;
-font-weight:bold;
 color:yellow;
 }
-
+#pixModal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.85);
+justify-content:center;
+align-items:center;
+z-index:999;
+}
+#pixBox{
+background:white;
+color:black;
+padding:20px;
+border-radius:10px;
+width:300px;
+}
+#pixCode{
+word-break:break-all;
+font-size:12px;
+background:#eee;
+padding:8px;
+margin-top:10px;
+}
 </style>
 </head>
-
 <body>
-
 <div id="app">
-
 <h1>🎰 Roleta Premiada</h1>
-
-<div id="saldo">Saldo: R$ <span id="valorSaldo">0</span></div>
-
+<div id="saldo">
+Saldo: R$ <span id="valorSaldo">10</span>
+</div>
+<div class="roletaBox">
 <div class="pointer"></div>
-
-<div class="roleta">
-<canvas id="wheel"></canvas>
+<canvas id="wheel" width="320" height="320"></canvas>
 </div>
-
-<button onclick="girar()">GIRAR</button>
-
+<button onclick="girar()">🎰 GIRAR</button>
 <div id="resultado"></div>
-
-<br>
-
-<button onclick="openModal()">Recarga via Pix</button>
-
+<button class="pixBtn" onclick="abrirPix()">💳 Recarga via Pix</button>
 </div>
 
-
-<audio id="spin" src="sons/spin.mp3"></audio>
-<audio id="win" src="sons/win.mp3"></audio>
-<audio id="lose" src="sons/lose.mp3"></audio>
-
-
-<script src="MPayment/Modal.js"></script>
-<script src="MPayment/Script.js"></script>
+<!-- MODAL PIX -->
+<div id="pixModal">
+<div id="pixBox">
+<h3>Pagamento Pix</h3>
+<p id="pixStatus">Gerando PIX...</p>
+<img id="qrCode" width="200" alt="QR Code PIX">
+<div id="pixCode"></div>
+<button onclick="copiarPix()">Copiar código Pix</button>
+<br><br>
+<button onclick="fecharPix()">Fechar</button>
+</div>
+</div>
 
 <script>
-
-const canvas = document.getElementById("wheel")
-const ctx = canvas.getContext("2d")
-
-canvas.width = 320
-canvas.height = 320
-
-let saldo = localStorage.getItem("saldoRoleta") || 0
-saldo = parseFloat(saldo)
-
-document.getElementById("valorSaldo").innerText = saldo
-
-const premios = [
-0,0,0,10,20,30,50,80,100,150,200,300,500,1000
-]
-
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const premios = [0,0,0,5,10,20,50,100,200,500,1000];
 const cores = [
-"#222","#333","#444","#555","#666","#777",
-"#888","#999","#aaa","#bbb","#ccc","#ddd"
-]
+"#333","#444","#555",
+"#cc0000","#dd0000",
+"#00aa00","#00cc00",
+"#0000aa","#0000cc",
+"#ffaa00","#ffd700"
+];
+let saldo = localStorage.getItem("saldoCassino") || 10;
+saldo = parseFloat(saldo);
+document.getElementById("valorSaldo").innerText = saldo;
 
-let angle = 0
+const fatia = (Math.PI * 2) / premios.length;
 
-function desenhar(){
+function desenhar() {
+  for (let i = 0; i < premios.length; i++) {
+    ctx.beginPath();
+    ctx.moveTo(160, 160);
+    ctx.arc(160, 160, 160, fatia * i, fatia * (i + 1));
+    ctx.fillStyle = cores[i];
+    ctx.fill();
+    ctx.save();
+    ctx.translate(160, 160);
+    ctx.rotate(fatia * i + fatia / 2);
+    ctx.fillStyle = "white";
+    ctx.font = "bold 14px Arial";
+    ctx.fillText("R$" + premios[i], 70, 5);
+    ctx.restore();
+  }
+}
+desenhar();
 
-let fatia = (Math.PI*2)/premios.length
+let girando = false;
+let rotacao = 0;
 
-for(let i=0;i<premios.length;i++){
-
-ctx.beginPath()
-ctx.moveTo(160,160)
-
-ctx.arc(
-160,160,
-160,
-fatia*i,
-fatia*(i+1)
-)
-
-ctx.fillStyle = cores[i%cores.length]
-ctx.fill()
-
-ctx.save()
-
-ctx.translate(160,160)
-ctx.rotate(fatia*i + fatia/2)
-
-ctx.fillStyle="black"
-ctx.font="bold 14px sans-serif"
-ctx.fillText("R$"+premios[i],60,5)
-
-ctx.restore()
-
+function girar() {
+  if (girando) return;
+  if (saldo <= 0) {
+    alert("Saldo insuficiente");
+    return;
+  }
+  saldo -= 1;
+  updateSaldo();
+  girando = true;
+  const voltas = Math.floor(Math.random() * 5) + 5;
+  const extra = Math.random() * 360;
+  rotacao += (voltas * 360) + extra;
+  canvas.style.transform = "rotate(" + rotacao + "deg)";
+  setTimeout(finalizar, 5000);
 }
 
+function finalizar() {
+  girando = false;
+  let angulo = rotacao % 360;
+  let setor = Math.floor((360 - angulo) / (360 / premios.length));
+  let premio = premios[setor];
+  saldo += premio;
+  updateSaldo();
+  if (premio > 0) {
+    document.getElementById("resultado").innerText = "🎉 Você ganhou R$" + premio;
+  } else {
+    document.getElementById("resultado").innerText = "😢 Não ganhou";
+  }
 }
 
-desenhar()
-
-let girando=false
-
-function girar(){
-
-if(girando) return
-
-if(saldo <= 0){
-alert("Saldo insuficiente")
-return
+function updateSaldo() {
+  localStorage.setItem("saldoCassino", saldo);
+  document.getElementById("valorSaldo").innerText = saldo;
 }
 
-saldo -= 1
-updateSaldo()
-
-document.getElementById("spin").play()
-
-girando=true
-
-let voltas = Math.random()*360 + 720
-
-let start = angle
-let end = angle + voltas
-
-let duracao = 4000
-let startTime=null
-
-function animar(time){
-
-if(!startTime) startTime=time
-
-let progress = time-startTime
-
-let pct = progress/duracao
-
-if(pct>1) pct=1
-
-angle = start + (end-start)*pct
-
-canvas.style.transform = "rotate("+angle+"deg)"
-
-if(pct<1){
-
-requestAnimationFrame(animar)
-
-}else{
-
-finalizar()
-
+function abrirPix() {
+  document.getElementById("pixModal").style.display = "flex";
+  gerarPix();
 }
 
+function fecharPix() {
+  document.getElementById("pixModal").style.display = "none";
 }
 
-requestAnimationFrame(animar)
+function gerarPix() {
+  const valor = 18.00;                  // ← Mude aqui o valor da recarga
+  const chavePix = "sua-chave-pix@aqui.com";   // ← COLOQUE SUA CHAVE PIX REAL AQUI (e-mail, telefone, CPF ou chave aleatória)
+  const nomeRecebedor = "Seu Nome Aqui";       // ← Seu nome ou apelido
+  const cidade = "Fortaleza";                  // ← Sua cidade
 
+  const pixStatus = document.getElementById("pixStatus");
+  const qrCodeImg = document.getElementById("qrCode");
+  const pixCodeDiv = document.getElementById("pixCode");
+
+  pixStatus.innerText = "Gerando código Pix...";
+
+  // Gera o payload BR Code (formato oficial PIX estático)
+  const txid = "RECARGA" + Math.floor(Math.random() * 1000000); // txid simples
+  let payload = "000201";
+  payload += "26580014BR.GOV.BCB.PIX";
+  payload += "01" + ("0" + chavePix.length).slice(-2) + chavePix;
+  payload += "52040000"; // merchant category
+  payload += "5303986";  // BRL
+  payload += "54" + ("0" + valor.toFixed(2).length).slice(-2) + valor.toFixed(2).replace(".", "");
+  payload += "5802BR";
+  payload += "59" + ("0" + nomeRecebedor.length).slice(-2) + nomeRecebedor;
+  payload += "60" + ("0" + cidade.length).slice(-2) + cidade;
+  payload += "62070503***";
+  payload += "6304"; // CRC placeholder
+
+  // Calcula CRC16 simples (obrigatório no final)
+  function crc16(str) {
+    let crc = 0xFFFF;
+    for (let i = 0; i < str.length; i++) {
+      crc ^= str.charCodeAt(i) << 8;
+      for (let j = 0; j < 8; j++) {
+        if (crc & 0x8000) crc = (crc << 1) ^ 0x1021;
+        else crc <<= 1;
+        crc &= 0xFFFF;
+      }
+    }
+    return crc.toString(16).toUpperCase().padStart(4, "0");
+  }
+  const crc = crc16(payload);
+  payload += crc;
+
+  pixCodeDiv.innerText = payload;
+  pixStatus.innerText = "Escaneie o QR Code ou copie o código";
+
+  // Gera QR Code usando serviço gratuito
+  qrCodeImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(payload);
 }
 
-function finalizar(){
-
-girando=false
-
-let graus = angle % 360
-
-let setor = Math.floor((360-graus)/(360/premios.length))
-
-let premio = premios[setor]
-
-saldo += premio
-
-updateSaldo()
-
-if(premio>0){
-document.getElementById("resultado").innerText="🎉 Você ganhou R$"+premio
-document.getElementById("win").play()
-}else{
-document.getElementById("resultado").innerText="😢 Não ganhou"
-document.getElementById("lose").play()
+function copiarPix() {
+  const chave = document.getElementById("pixCode").innerText;
+  navigator.clipboard.writeText(chave).then(() => {
+    alert("Código Pix copiado! Cole no app do seu banco.");
+  }).catch(() => {
+    alert("Erro ao copiar. Selecione o texto manualmente.");
+  });
 }
-
-}
-
-function updateSaldo(){
-
-localStorage.setItem("saldoRoleta",saldo)
-document.getElementById("valorSaldo").innerText=saldo
-
-}
-
 </script>
-
 </body>
 </html>
