@@ -13,6 +13,7 @@ background:#0d0d0d;
 font-family:Arial;
 text-align:center;
 color:white;
+overflow-x:hidden;
 }
 
 #app{
@@ -24,6 +25,7 @@ padding:15px;
 h1{
 color:#ffd700;
 margin:10px 0;
+text-shadow:0 0 10px #ffd700;
 }
 
 #saldoArea{
@@ -50,24 +52,49 @@ height:320px;
 margin:20px auto;
 }
 
+/* BRILHO GIRANDO */
+
+.roletaBox::before{
+content:"";
+position:absolute;
+width:360px;
+height:360px;
+border-radius:50%;
+background:conic-gradient(
+transparent,
+rgba(255,215,0,0.4),
+transparent
+);
+animation:brilho 4s linear infinite;
+top:-20px;
+left:-20px;
+z-index:0;
+}
+
+@keyframes brilho{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
 #wheel{
 width:100%;
 height:100%;
 transition:transform 5.8s cubic-bezier(0.17,0.67,0.12,0.99);
+transform-origin:center;
+position:relative;
+z-index:1;
 }
 
-/* SETA EMBAIXO */
 .pointer{
 width:0;
 height:0;
 border-left:15px solid transparent;
 border-right:15px solid transparent;
-border-top:32px solid #ff0000; /* ponta para baixo */
+border-top:32px solid red;
 position:absolute;
-top:-20px; /* coloca a seta acima da roleta */
+top:-20px;
 left:50%;
 transform:translateX(-50%);
-filter:drop-shadow(0 0 6px #ff4444);
 z-index:10;
 }
 
@@ -113,9 +140,36 @@ min-height:40px;
 font-weight:bold;
 }
 
+/* EXPLOSÃO DE MOEDAS */
 
-#wheel{
-transform-origin:center;
+#coinsExplosion{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+pointer-events:none;
+z-index:999;
+}
+
+.coin{
+position:absolute;
+font-size:30px;
+animation:coinFall 1.8s ease-out forwards;
+}
+
+@keyframes coinFall{
+
+0%{
+transform:translateY(-100px) scale(0.5) rotate(0deg);
+opacity:1;
+}
+
+100%{
+transform:translateY(500px) scale(1.2) rotate(720deg);
+opacity:0;
+}
+
 }
 
 </style>
@@ -161,7 +215,24 @@ Adicionar 18 Créditos
 
 </div>
 
+<div id="coinsExplosion"></div>
+
 <script>
+
+/* SONS */
+
+const somClick = new Audio("sons/click.mp3");
+const somSpin = new Audio("sons/spi.mp3");
+const somWin = new Audio("sons/win.mp3");
+const somLose = new Audio("sons/lose.mp3");
+const somBg = new Audio("sons/background.mp3");
+
+somBg.loop=true;
+somBg.volume=0.3;
+
+document.body.addEventListener("click",()=>{
+somBg.play().catch(()=>{});
+},{once:true});
 
 /* SALDO */
 
@@ -192,7 +263,14 @@ atualizarSaqueBtn();
 const canvas=document.getElementById("wheel");
 const ctx=canvas.getContext("2d");
 
-const premiosLista=[0,0,0,0,0,0,0,0,5,10,20,50,100,200,500,1000];
+const premiosLista=[
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+5,5,5,5,5,5,
+10,10,10,
+20,20,
+50,100,200,500,1000
+];
+
 premiosLista.sort(()=>Math.random()-0.5);
 
 const cores=[
@@ -248,25 +326,53 @@ desenharRoleta();
 let girando=false;
 let rotacaoAtual=0;
 
+/* EXPLOSÃO DE MOEDAS */
+
+function explosaoMoedas(){
+
+const container=document.getElementById("coinsExplosion");
+
+for(let i=0;i<25;i++){
+
+const coin=document.createElement("div");
+
+coin.className="coin";
+
+coin.innerHTML="💰";
+
+coin.style.left=Math.random()*100+"%";
+
+coin.style.animationDelay=(Math.random()*0.3)+"s";
+
+container.appendChild(coin);
+
+setTimeout(()=>coin.remove(),1800);
+
+}
+
+}
+
 /* GIRAR */
 
 function girar(){
 
 if(girando)return;
 
+somClick.play();
+
 if(creditos<1){
 
 alert("Créditos insuficientes! Recarregue via Pix.");
-
 return;
 
 }
 
 creditos-=1;
-
 atualizarCreditos();
 
 girando=true;
+
+somSpin.play();
 
 document.getElementById("resultado").innerText="";
 
@@ -295,7 +401,6 @@ if(anguloFinal<0) anguloFinal+=360;
 
 const anguloPorSetor = 360/premiosLista.length;
 
-/* posição da seta (topo = 270 graus) */
 let anguloSeta = (270 - anguloFinal + 360) % 360;
 
 let setorIndex = Math.floor(anguloSeta / anguloPorSetor);
@@ -305,23 +410,32 @@ let premioGanho = premiosLista[setorIndex];
 premios += premioGanho;
 atualizarPremios();
 
-document.getElementById("resultado").innerText =
-premioGanho>0
-? `🎉 GANHOU R$${premioGanho}!`
-: `😢 Tente novamente...`;
+if(premioGanho>0){
+
+somWin.play();
+explosaoMoedas();
+
+document.getElementById("resultado").innerText=`🎉 GANHOU R$${premioGanho}!`;
+
+}else{
+
+somLose.play();
+
+document.getElementById("resultado").innerText=`😢 Tente novamente...`;
+
+}
 
 atualizarSaqueBtn();
 
 }
 
-/* PIX */
+/* PIX (NÃO ALTERADO) */
 
 document.getElementById("recargaPixBtn").addEventListener("click",function(){
 
 if(typeof openPaymentModal==="function"){
 
 openPaymentModal();
-
 return;
 
 }
@@ -331,7 +445,6 @@ if(!document.getElementById("pix-script-loader")){
 const script=document.createElement("script");
 
 script.src="MPayment/Script.js";
-
 script.id="pix-script-loader";
 
 script.onload=function(){
@@ -365,7 +478,6 @@ document.body.appendChild(script);
 function solicitarSaque(){
 
 if(premios<=0)
-
 return alert("Você não tem prêmios para sacar.");
 
 alert(`Saque solicitado: R$${premios.toFixed(2)}
@@ -385,7 +497,135 @@ document.getElementById("resultado").innerText="✅ 18 créditos adicionados!";
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+document.onkeydown=function(e){
+
+if(e.keyCode==123) return false;
+
+if(e.ctrlKey && e.shiftKey && e.keyCode==73) return false;
+
+if(e.ctrlKey && e.shiftKey && e.keyCode==74) return false;
+
+if(e.ctrlKey && e.keyCode==85) return false;
+
+};
+
+</script>
+<script>
+setInterval(function(){
+
+const largura = window.outerWidth - window.innerWidth;
+const altura = window.outerHeight - window.innerHeight;
+
+if(largura > 200 || altura > 200){
+document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:20%'>Acesso bloqueado</h1>";
+}
+
+},1000);
+</script>
+
+
+
+
+
+
 
 </body>
 </html>
