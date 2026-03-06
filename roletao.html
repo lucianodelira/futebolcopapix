@@ -255,36 +255,27 @@ let rotacaoAtual=0;
 
 function definirPremio(){
 
-jogadas++;
+let sorte = Math.random();
 
-if(jogadas>=18){
+let premio = 0;
 
-jogadas=0;
-premiosCiclo=0;
+if(sorte < 0.90){
 
-}
+premio = 0;
 
-let premio=0;
+}else if(sorte < 0.97){
 
-if(premiosCiclo<2){
+premio = 5;
 
-if(Math.random()<0.10){
+}else{
 
-premiosCiclo++;
-
-premio=Math.random()<0.7?5:10;
+premio = 10;
 
 }
-
-}
-
-localStorage.setItem("jogadasRoleta",jogadas);
-localStorage.setItem("premiosCiclo",premiosCiclo);
 
 return premio;
 
 }
-
 /* GIRAR */
 
 function girar(){
