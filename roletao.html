@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎰 Roleta Premiada</title>
+
 <style>
+
 body{
 margin:0;
 background:#0d0d0d;
@@ -13,57 +15,61 @@ text-align:center;
 color:white;
 overflow-x:hidden;
 }
+
 #app{
 max-width:420px;
 margin:auto;
 padding:15px;
 }
+
 h1{
 color:#ffd700;
 margin:10px 0;
 text-shadow:0 0 10px #ffd700;
 }
+
 #saldoArea{
 display:flex;
 justify-content:space-around;
 margin:15px 0;
 font-size:20px;
 }
+
 .credito-box{
 background:#222;
 padding:10px 20px;
 border-radius:10px;
 border:2px solid #444;
 }
+
 .credito{color:#00ff9c;font-weight:bold;}
 .premio{color:#ffcc00;font-weight:bold;}
+
 .roletaBox{
 position:relative;
 width:320px;
 height:320px;
 margin:20px auto;
 }
-/* BRILHO GIRANDO */
+
 .roletaBox::before{
 content:"";
 position:absolute;
 width:360px;
 height:360px;
 border-radius:50%;
-background:conic-gradient(
-transparent,
-rgba(255,215,0,0.4),
-transparent
-);
+background:conic-gradient(transparent,rgba(255,215,0,0.4),transparent);
 animation:brilho 4s linear infinite;
 top:-20px;
 left:-20px;
 z-index:0;
 }
+
 @keyframes brilho{
 0%{transform:rotate(0deg);}
 100%{transform:rotate(360deg);}
 }
+
 #wheel{
 width:100%;
 height:100%;
@@ -72,6 +78,7 @@ transform-origin:center;
 position:relative;
 z-index:1;
 }
+
 .pointer{
 width:0;
 height:0;
@@ -84,6 +91,7 @@ left:50%;
 transform:translateX(-50%);
 z-index:10;
 }
+
 button{
 padding:14px 28px;
 font-size:18px;
@@ -93,11 +101,13 @@ border-radius:10px;
 font-weight:bold;
 cursor:pointer;
 }
+
 #giraBtn{
 background:#ffd700;
 color:#000;
 width:100%;
 }
+
 .recargaBtn{
 width:100%;
 height:50px;
@@ -107,6 +117,7 @@ font-size:20px;
 border-radius:10px;
 margin:15px 0;
 }
+
 #sacarBtn{
 background:#ff6600;
 color:white;
@@ -115,300 +126,233 @@ width:100%;
 height:50px;
 font-size:18px;
 }
+
 #resultado{
 margin:20px 0;
 font-size:26px;
 min-height:40px;
 font-weight:bold;
 }
-/* EXPLOSÃO DE MOEDAS */
-#coinsExplosion{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-pointer-events:none;
-z-index:999;
-}
-.coin{
-position:absolute;
-font-size:30px;
-animation:coinFall 1.8s ease-out forwards;
-}
-@keyframes coinFall{
-0%{
-transform:translateY(-100px) scale(0.5) rotate(0deg);
-opacity:1;
-}
-100%{
-transform:translateY(500px) scale(1.2) rotate(720deg);
-opacity:0;
-}
-}
-#loading {
-  display: none;
-  color: #ffd700;
-  font-size: 18px;
-  margin: 10px 0;
-}
+
 </style>
-<link rel="stylesheet" href="MPayment/Styles.css">
 </head>
+
 <body>
+
 <div id="app">
+
 <h1>🎰 Roleta Premiada</h1>
+
 <div id="saldoArea">
+
 <div class="credito-box">
-Créditos: R$ <span id="valorCreditos" class="credito">0.00</span>
+Créditos: R$ <span id="valorCreditos">0</span>
 </div>
+
 <div class="credito-box">
-Prêmios: R$ <span id="valorPremios" class="premio">0.00</span>
+Prêmios: R$ <span id="valorPremios">0</span>
 </div>
+
 </div>
+
 <div class="roletaBox">
 <div class="pointer"></div>
 <canvas id="wheel" width="320" height="320"></canvas>
 </div>
 
-<div id="loading">Processando giro...</div>
 <button id="giraBtn" onclick="girar()">GIRAR (custa R$1)</button>
+
 <div id="resultado"></div>
 
-<button class="recargaBtn" id="recargaPixBtn">Recarga via Pix</button>
-<button id="sacarBtn" onclick="solicitarSaque()">Sacar Prêmios</button>
 <button onclick="adicionar18Creditos()" style="background:#0099ff;color:white;width:100%;height:45px;">
-Adicionar 18 Créditos (teste)
+Adicionar 18 Créditos
 </button>
+
 </div>
 
-<div id="coinsExplosion"></div>
-
 <script>
-// ────────────────────────────────────────────────
-//  CONFIGURAÇÃO PRINCIPAL
-// ────────────────────────────────────────────────
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMA4uSFGozFQn_S_UkgGB8ax_oZE9ihGFEyCykab94sm0SqDO2t856-FyrMBjgHwYR/exec";   // ← COLOQUE A URL REAL AQUI
 
-/* SONS */
-const somClick = new Audio("sons/click.mp3");
-const somSpin  = new Audio("sons/spi.mp3");
-const somWin   = new Audio("sons/win.mp3");
-const somLose  = new Audio("sons/lose.mp3");
-const somBg    = new Audio("sons/background.mp3");
-somBg.loop = true;
-somBg.volume = 0.3;
-document.body.addEventListener("click", () => {
-  somBg.play().catch(()=>{});
-}, {once:true});
+/* SALDOS */
 
-/* SALDO LOCAL (visual) — o valor real de prêmios deve vir do servidor no futuro */
 let creditos = parseInt(localStorage.getItem('credits')) || 0;
-let premios  = parseFloat(localStorage.getItem("premiosRoleta")) || 0;
+let premios = parseFloat(localStorage.getItem("premiosRoleta")) || 0;
 
-function atualizarCreditos(){
-  localStorage.setItem('credits', creditos);
-  document.getElementById("valorCreditos").innerText = creditos.toFixed(2);
+let jogadas = parseInt(localStorage.getItem("jogadasRoleta")) || 0;
+let premiosCiclo = parseInt(localStorage.getItem("premiosCiclo")) || 0;
+
+const valorCreditos=document.getElementById("valorCreditos");
+const valorPremios=document.getElementById("valorPremios");
+
+function atualizar(){
+valorCreditos.innerText=creditos;
+valorPremios.innerText=premios.toFixed(2);
+localStorage.setItem("credits",creditos);
+localStorage.setItem("premiosRoleta",premios);
 }
-function atualizarPremios(){
-  localStorage.setItem("premiosRoleta", premios);
-  document.getElementById("valorPremios").innerText = premios.toFixed(2);
-}
-function atualizarSaqueBtn(){
-  document.getElementById("sacarBtn").style.display = premios > 0 ? "block" : "none";
-}
-atualizarCreditos();
-atualizarPremios();
-atualizarSaqueBtn();
 
-// ────────────────────────────────────────────────
-//  ROLETA (visual)
-// ────────────────────────────────────────────────
-const canvas = document.getElementById("wheel");
-const ctx = canvas.getContext("2d");
+atualizar();
 
-const premiosLista = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,10,10,10,20,20,50,100,200,500,1000];
-const cores = ["#333","#444","#555","#666","#777","#888","#cc0000","#dd0000","#00aa00","#00cc00","#0000aa","#0000cc","#ffaa00","#ffd700","#ff8800","#ff5500"];
+/* ROLETA */
 
-const fatia = (Math.PI*2) / premiosLista.length;
+const canvas=document.getElementById("wheel");
+const ctx=canvas.getContext("2d");
+
+const premiosLista=[
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+5,5,5,5,
+10,10,
+20,
+50
+];
+
+const cores=[
+"#333","#444","#555","#666",
+"#777","#888","#cc0000","#dd0000",
+"#00aa00","#00cc00","#ffaa00","#ffd700"
+];
+
+const fatia=(Math.PI*2)/premiosLista.length;
 
 function desenharRoleta(){
-  for(let i = 0; i < premiosLista.length; i++){
-    ctx.beginPath();
-    ctx.moveTo(160,160);
-    ctx.arc(160, 160, 160, fatia*i, fatia*(i+1));
-    ctx.fillStyle = cores[i % cores.length];
-    ctx.fill();
-    ctx.strokeStyle = "#111";
-    ctx.lineWidth = 2;
-    ctx.stroke();
 
-    ctx.save();
-    ctx.translate(160,160);
-    ctx.rotate(fatia*i + fatia/2);
-    ctx.fillStyle = "white";
-    ctx.font = "bold 16px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("R$"+premiosLista[i], 85, 6);
-    ctx.restore();
-  }
+for(let i=0;i<premiosLista.length;i++){
+
+ctx.beginPath();
+ctx.moveTo(160,160);
+
+ctx.arc(160,160,160,fatia*i,fatia*(i+1));
+
+ctx.fillStyle=cores[i%cores.length];
+ctx.fill();
+
+ctx.strokeStyle="#111";
+ctx.lineWidth=2;
+ctx.stroke();
+
+ctx.save();
+
+ctx.translate(160,160);
+ctx.rotate(fatia*i+fatia/2);
+
+ctx.fillStyle="white";
+ctx.font="bold 16px Arial";
+ctx.textAlign="center";
+
+ctx.fillText("R$"+premiosLista[i],90,5);
+
+ctx.restore();
+
 }
+
+}
+
 desenharRoleta();
 
-let girando = false;
-let rotacaoAtual = 0;
+let girando=false;
+let rotacaoAtual=0;
 
-// EXPLOSÃO DE MOEDAS
-function explosaoMoedas(){
-  const container = document.getElementById("coinsExplosion");
-  for(let i = 0; i < 25; i++){
-    const coin = document.createElement("div");
-    coin.className = "coin";
-    coin.innerHTML = "💰";
-    coin.style.left = Math.random()*100 + "%";
-    coin.style.animationDelay = (Math.random()*0.3) + "s";
-    container.appendChild(coin);
-    setTimeout(() => coin.remove(), 1800);
-  }
+/* LOGICA DE PREMIO */
+
+function definirPremio(){
+
+jogadas++;
+
+if(jogadas>=18){
+
+jogadas=0;
+premiosCiclo=0;
+
 }
 
-// ────────────────────────────────────────────────
-//  GIRAR → CHAMA O GOOGLE SCRIPT
-// ────────────────────────────────────────────────
-async function girar(){
-  if(girando) return;
+let premio=0;
 
-  if(creditos < 1){
-    alert("Créditos insuficientes! Recarregue via Pix.");
-    return;
-  }
+if(premiosCiclo<2){
 
-  somClick.play();
-  creditos -= 1;
-  atualizarCreditos();
+if(Math.random()<0.10){
 
-  girando = true;
-  document.getElementById("loading").style.display = "block";
-  document.getElementById("resultado").innerText = "";
-  document.getElementById("giraBtn").disabled = true;
+premiosCiclo++;
 
-  // Animação visual da roleta
-  somSpin.play();
-  const voltas = Math.floor(Math.random()*5) + 10;
-  const anguloExtra = Math.random() * 360;
-  const rotacaoFinal = rotacaoAtual + (voltas*360) + anguloExtra;
-  canvas.style.transform = `rotate(${rotacaoFinal}deg)`;
-  rotacaoAtual = rotacaoFinal;
+premio=Math.random()<0.7?5:10;
 
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "spin",
-        userId: "user_" + (localStorage.getItem("userId") || Date.now())   // ← personalize como quiser
-      })
-    });
-
-    const result = await response.json();
-
-    if(!result.success){
-      throw new Error(result.error || "Erro desconhecido no servidor");
-    }
-
-    const premio = result.premio || 0;
-
-    // Atualiza prêmios (vem do servidor)
-    premios += premio;
-    atualizarPremios();
-    atualizarSaqueBtn();
-
-    setTimeout(() => {
-      if(premio > 0){
-        somWin.play();
-        explosaoMoedas();
-        document.getElementById("resultado").innerText = `🎉 GANHOU R$${premio}!`;
-      } else {
-        somLose.play();
-        document.getElementById("resultado").innerText = `😢 Tente novamente...`;
-      }
-    }, 6200);
-
-  } catch(err){
-    console.error(err);
-    document.getElementById("resultado").innerText = "Erro ao conectar com o servidor.";
-    alert("Falha na comunicação com o servidor. Tente novamente.");
-  }
-
-  setTimeout(() => {
-    girando = false;
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("giraBtn").disabled = false;
-  }, 7000);
 }
 
-// ────────────────────────────────────────────────
-//  PIX (NÃO ALTERADO)
-// ────────────────────────────────────────────────
-document.getElementById("recargaPixBtn").addEventListener("click", function(){
-  if(typeof openPaymentModal === "function"){
-    openPaymentModal();
-    return;
-  }
-
-  if(!document.getElementById("pix-script-loader")){
-    const script = document.createElement("script");
-    script.src = "MPayment/Script.js";
-    script.id = "pix-script-loader";
-    script.onload = function(){
-      const modalScript = document.createElement("script");
-      modalScript.src = "MPayment/Modal.js";
-      modalScript.onload = function(){
-        if(typeof openPaymentModal === "function"){
-          openPaymentModal();
-        }
-      };
-      document.body.appendChild(modalScript);
-    };
-    document.body.appendChild(script);
-  }
-});
-
-// ────────────────────────────────────────────────
-//  SAQUE (sem alteração)
-// ────────────────────────────────────────────────
-function solicitarSaque(){
-  if(premios <= 0) return alert("Você não tem prêmios para sacar.");
-  alert(`Saque solicitado: R$${premios.toFixed(2)}\nEntre em contato via WhatsApp para processar.`);
 }
 
-// ────────────────────────────────────────────────
-//  ADMIN / TESTE (sem alteração)
-// ────────────────────────────────────────────────
+localStorage.setItem("jogadasRoleta",jogadas);
+localStorage.setItem("premiosCiclo",premiosCiclo);
+
+return premio;
+
+}
+
+/* GIRAR */
+
+function girar(){
+
+if(girando)return;
+
+if(creditos<1){
+
+alert("Créditos insuficientes");
+return;
+
+}
+
+creditos--;
+atualizar();
+
+girando=true;
+
+const voltas=Math.floor(Math.random()*5)+10;
+const anguloExtra=Math.random()*360;
+
+const rotacaoFinal=rotacaoAtual+(voltas*360)+anguloExtra;
+
+canvas.style.transform=`rotate(${rotacaoFinal}deg)`;
+
+rotacaoAtual=rotacaoFinal;
+
+setTimeout(finalizarGiro,6000);
+
+}
+
+function finalizarGiro(){
+
+girando=false;
+
+let premioGanho=definirPremio();
+
+premios+=premioGanho;
+
+atualizar();
+
+if(premioGanho>0){
+
+document.getElementById("resultado").innerText=
+`🎉 GANHOU R$${premioGanho}`;
+
+}else{
+
+document.getElementById("resultado").innerText=
+"😢 Não foi dessa vez";
+
+}
+
+}
+
+/* ADMIN */
+
 function adicionar18Creditos(){
-  creditos += 18;
-  atualizarCreditos();
-  document.getElementById("resultado").innerText = "✅ 18 créditos adicionados!";
+
+creditos+=18;
+atualizar();
+
+document.getElementById("resultado").innerText=
+"✅ 18 créditos adicionados";
+
 }
+
 </script>
 
-<script>
-// Bloqueios (mantidos como estavam)
-document.addEventListener("contextmenu", e => e.preventDefault());
-document.onkeydown = function(e){
-  if(e.keyCode == 123) return false;
-  if(e.ctrlKey && e.shiftKey && e.keyCode == 73) return false;
-  if(e.ctrlKey && e.shiftKey && e.keyCode == 74) return false;
-  if(e.ctrlKey && e.keyCode == 85) return false;
-};
-
-setInterval(function(){
-  const largura = window.outerWidth - window.innerWidth;
-  const altura  = window.outerHeight - window.innerHeight;
-  if(largura > 200 || altura > 200){
-    document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:20%'>Acesso bloqueado</h1>";
-  }
-},1000);
-</script>
 </body>
 </html>
