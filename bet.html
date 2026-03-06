@@ -566,5 +566,66 @@ document.getElementById("recargaPix").addEventListener("click", function () {
 </script>
 
 <script src="MPayment/Modal.js"></script>
+
+
+  <script>
+
+// bloquear botão direito
+document.addEventListener("contextmenu", function(e){
+  e.preventDefault();
+});
+
+// bloquear teclas de inspeção
+document.addEventListener("keydown", function(e){
+
+  // F12
+  if(e.keyCode == 123){
+    e.preventDefault();
+    return false;
+  }
+
+  // Ctrl+Shift+I
+  if(e.ctrlKey && e.shiftKey && e.keyCode == 73){
+    e.preventDefault();
+    return false;
+  }
+
+  // Ctrl+Shift+J
+  if(e.ctrlKey && e.shiftKey && e.keyCode == 74){
+    e.preventDefault();
+    return false;
+  }
+
+  // Ctrl+U
+  if(e.ctrlKey && e.keyCode == 85){
+    e.preventDefault();
+    return false;
+  }
+
+  // Ctrl+Shift+C
+  if(e.ctrlKey && e.shiftKey && e.keyCode == 67){
+    e.preventDefault();
+    return false;
+  }
+
+});
+
+// detectar DevTools aberto
+setInterval(function(){
+
+  const largura = window.outerWidth - window.innerWidth > 160;
+  const altura = window.outerHeight - window.innerHeight > 160;
+
+  if(largura || altura){
+    document.body.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;font-size:22px;text-align:center;">
+      ⚠️ Acesso bloqueado
+      </div>
+    `;
+  }
+
+},1000);
+
+  </script>
 </body>
 </html>
